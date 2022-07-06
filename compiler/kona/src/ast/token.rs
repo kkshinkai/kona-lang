@@ -3,7 +3,7 @@
 
 use std::fmt;
 
-use crate::span::span::Span;
+use crate::span_legacy::span::Span;
 
 #[derive(PartialEq, Clone)]
 pub struct Token {

@@ -1,7 +1,7 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
-use crate::{ast::token::{Token, TokenKind, Lit, Ident, Keyword}, span::span::Span};
+use crate::{ast::token::{Token, TokenKind, Lit, Ident, Keyword}, span_legacy::span::Span};
 
 use super::lookahead::{AheadLooker, Lookahead};
 
