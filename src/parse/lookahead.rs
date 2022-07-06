@@ -5,7 +5,8 @@ use std::collections::VecDeque;
 
 #[derive(Clone, Debug)]
 pub struct AheadLooker<I: Iterator> {
-    iter: I,
+    pub iter: I, // FIXME: This should be private, but we need to access it in
+                 //        the lexer. We need a better abstraction.
     peeked_queue: VecDeque<I::Item>,
 }
 
