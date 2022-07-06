@@ -2,3 +2,6 @@
 name = "kona"
 version = "0.1.0"
 edition = "2021"
+
+[dependencies]
+kona_span = { path = "../kona_span" }

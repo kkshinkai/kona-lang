@@ -5,3 +5,10 @@ version = 3
 [[package]]
 name = "kona"
 version = "0.1.0"
+dependencies = [
+ "kona_span",
+]
+
+[[package]]
+name = "kona_span"
+version = "0.1.0"
