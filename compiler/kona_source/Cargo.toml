@@ -1,4 +1,4 @@
 [package]
-name = "kona_span"
+name = "kona_source"
 version = "0.1.0"
 edition = "2021"

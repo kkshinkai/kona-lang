@@ -6,9 +6,9 @@ version = 3
 name = "kona"
 version = "0.1.0"
 dependencies = [
- "kona_span",
+ "kona_source",
 ]
 
 [[package]]
-name = "kona_span"
+name = "kona_source"
 version = "0.1.0"
