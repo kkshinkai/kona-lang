@@ -45,6 +45,12 @@ pub struct SourceFile {
     non_narrow_chars: Vec<NonNarrowChar>,
 }
 
+impl SourceFile {
+    pub fn path(&self) -> &FilePath {
+        &self.path
+    }
+}
+
 
 /// Represents a path to a source file.
 ///

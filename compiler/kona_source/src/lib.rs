@@ -2,5 +2,6 @@
 // root for license information.
 
 pub mod pos;
+pub mod pos_info;
 pub mod interval;
 pub mod source_file;
