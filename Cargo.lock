@@ -10,5 +10,9 @@ dependencies = [
 ]
 
 [[package]]
+name = "kona_lexer"
+version = "0.1.0"
+
+[[package]]
 name = "kona_source"
 version = "0.1.0"
