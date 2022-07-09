@@ -13,8 +13,7 @@ impl Token {
 }
 
 pub enum TokenKind {
-    Keyword(Keyword),
-    Ident(Ident),
+    Ident(IdentKind),
     Lit(LitKind),
 
     Semi,
@@ -29,29 +28,10 @@ pub enum TokenKind {
 }
 
 pub enum LitKind {
-    Int(i32),
-    Float(f64),
-    String(String),
-    Bool(bool),
-}
-
-pub enum Keyword {
-    Else,
-    End,
-    Fn,
-    If,
-    In,
-    Let,
-    Op,
-    Then,
-    Val,
-    Eq,
-    DArrow,
-}
-
-pub struct Ident {
-    name: String,
-    kind: IdentKind,
+    Int,
+    Float,
+    String,
+    Bool,
 }
 
 pub enum IdentKind {
