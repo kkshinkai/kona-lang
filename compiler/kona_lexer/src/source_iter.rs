@@ -38,6 +38,14 @@ pub(crate) struct SourceIter<'s> {
     chars: Chars<'s>,
 }
 
+impl<'s> Iterator for SourceIter<'s> {
+    type Item = char;
+
+    fn next(&mut self) -> Option<char> {
+        self.chars.next()
+    }
+}
+
 const EOF_CHAR: char = '\0';
 
 impl<'s> SourceIter<'s> {
