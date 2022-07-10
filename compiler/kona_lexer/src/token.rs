@@ -3,6 +3,7 @@
 
 use std::fmt;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Token {
     pub kind: TokenKind,
     pub len: usize,
@@ -14,6 +15,7 @@ impl Token {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TokenKind {
     Ident(IdentKind),
     Lit(LitKind),
@@ -25,6 +27,48 @@ pub enum TokenKind {
 
     Trivia(TriviaKind),
     Invalid,
+}
+
+impl TokenKind {
+    fn is_keyword(&self) -> bool {
+        matches!(self, TokenKind::Keyword(_))
+    }
+
+    fn is_ident(&self) -> bool {
+        matches!(self, TokenKind::Ident(_))
+    }
+
+    fn is_lit(&self) -> bool {
+        matches!(self, TokenKind::Lit(_))
+    }
+
+    fn is_string_lit(&self) -> bool {
+        matches!(self, TokenKind::Lit(LitKind::String))
+    }
+
+    fn is_int_lit(&self) -> bool {
+        matches!(self, TokenKind::Lit(LitKind::Int))
+    }
+
+    fn is_float_lit(&self) -> bool {
+        matches!(self, TokenKind::Lit(LitKind::Float))
+    }
+
+    fn is_bool_lit(&self) -> bool {
+        matches!(self, TokenKind::Lit(LitKind::Bool))
+    }
+
+    fn is_trivia(&self) -> bool {
+        matches!(self, TokenKind::Trivia(_))
+    }
+
+    fn is_whitespace(&self) -> bool {
+        matches!(self, TokenKind::Trivia(TriviaKind::Whitespace))
+    }
+
+    fn is_comment(&self) -> bool {
+        matches!(self, TokenKind::Trivia(TriviaKind::Comment(_)))
+    }
 }
 
 impl fmt::Display for TokenKind {
@@ -67,6 +111,7 @@ impl fmt::Display for TokenKind {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum LitKind {
     Int,
     Float,
@@ -74,11 +119,13 @@ pub enum LitKind {
     Bool,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum IdentKind {
     Alphanumeric,
     Symbolic,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum KeywordKind {
     DArrow,
     Eq,
@@ -93,11 +140,13 @@ pub enum KeywordKind {
     Val,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TriviaKind {
     Whitespace,
     Comment(CommentKind),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CommentKind {
     Line,
     Block,
