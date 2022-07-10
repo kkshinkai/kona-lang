@@ -222,6 +222,7 @@ impl SourceIter<'_> {
         self.eat_while(is_digit);
 
         if self.peek_fst() == '.' && is_digit(self.peek_snd()) {
+            self.eat(); // Eat '.'.
             self.eat_while(is_digit);
             Lit(LitKind::Float)
         } else {
