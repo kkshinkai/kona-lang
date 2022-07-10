@@ -109,8 +109,8 @@ impl SourceIter<'_> {
     fn lex_alpha_ident(&mut self) -> TokenKind {
         debug_assert!(is_alpha_ident_head(self.peek_fst()));
 
-        // Lex keywords, I'm not sure if this is a good implementation, but for
-        // now this is all I can do.
+        // Lex keywords and boolean literals, I'm not sure if this is a good
+        // implementation, but for now this is all I can do.
         if self.eat_if_is('e') {
             if self.eat_if_is('l') {
                 if self.eat_if_is('s') {
@@ -128,7 +128,17 @@ impl SourceIter<'_> {
                 }
             }
         } else if self.eat_if_is('f') {
-            if self.eat_if_is('n') {
+            if self.eat_if_is('a') {
+                if self.eat_if_is('l') {
+                    if self.eat_if_is('s') {
+                        if self.eat_if_is('e') {
+                            if !is_alpha_ident_body(self.peek_fst()) {
+                                return Lit(LitKind::Bool);
+                            }
+                        }
+                    }
+                }
+            } else if self.eat_if_is('n') {
                 if !is_alpha_ident_body(self.peek_fst()) {
                     return Keyword(KeywordKind::Fn);
                 }
@@ -158,6 +168,14 @@ impl SourceIter<'_> {
                 if self.eat_if_is('e') {
                     if !is_alpha_ident_body(self.peek_fst()) {
                         return Keyword(KeywordKind::Then);
+                    }
+                }
+            } else if self.eat_if_is('r') {
+                if self.eat_if_is('u') {
+                    if self.eat_if_is('e') {
+                        if !is_alpha_ident_body(self.peek_fst()) {
+                            return Lit(LitKind::Bool);
+                        }
                     }
                 }
             }
