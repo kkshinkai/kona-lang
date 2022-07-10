@@ -48,6 +48,9 @@ impl SourceIter<'_> {
             // Whitespace sequence.
             c if is_whitespace(c) => self.lex_whitespace(),
 
+            // End of line.
+            '\n' | '\r' => self.lex_eol(),
+
             // Alphanumeric identifier or keyword.
             c if is_alpha_ident_head(c) => self.lex_alpha_ident(),
 
@@ -104,6 +107,17 @@ impl SourceIter<'_> {
 
         self.eat_while(is_whitespace);
         Trivia(TriviaKind::Whitespace)
+    }
+
+    fn lex_eol(&mut self) -> TokenKind {
+        debug_assert!(self.peek_fst() == '\n' || self.peek_fst() == '\r');
+
+        let next = self.eat();
+        if next == '\r' && self.peek_fst() == '\n' {
+            self.eat(); // Cusume '\n' in CRLF.
+        }
+
+        Trivia(TriviaKind::Eol)
     }
 
     fn lex_alpha_ident(&mut self) -> TokenKind {

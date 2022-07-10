@@ -99,6 +99,7 @@ impl fmt::Display for TokenKind {
             TokenKind::RParen => "r_paren",
             TokenKind::Trivia(trivia_kind) => match trivia_kind {
                 TriviaKind::Whitespace => "whitespace",
+                TriviaKind::Eol => "eol",
                 TriviaKind::Comment(comment_kind) => {
                     match comment_kind {
                         CommentKind::Line => "line_comment",
@@ -143,6 +144,7 @@ pub enum KeywordKind {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TriviaKind {
     Whitespace,
+    Eol,
     Comment(CommentKind),
 }
 

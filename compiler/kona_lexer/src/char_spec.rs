@@ -2,7 +2,11 @@
 // root for license information.
 
 pub fn is_whitespace(c: char) -> bool {
-    c == ' ' || c == '\t' || c == '\n' || c == '\r'
+    c == ' ' || c == '\t'
+}
+
+pub fn is_eol(c: char) -> bool {
+    c == '\n' || c == '\r'
 }
 
 pub fn is_alpha_ident_head(c: char) -> bool {
