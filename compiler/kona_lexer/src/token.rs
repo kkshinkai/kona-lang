@@ -23,24 +23,21 @@ pub enum TokenKind {
     LParen,
     RParen,
 
-    Whitespace,
-    LineComment,
-    BlockComment,
-
+    Trivia(TriviaKind),
     Invalid,
 }
 
 impl fmt::Display for TokenKind {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", match self {
-            Self::Ident(_) => "ident",
-            Self::Lit(lit_kind) => match lit_kind {
+            TokenKind::Ident(_) => "ident",
+            TokenKind::Lit(lit_kind) => match lit_kind {
                 LitKind::Int => "int",
                 LitKind::Float => "float",
                 LitKind::String => "string",
                 LitKind::Bool => "bool",
             }
-            Self::Keyword(kw_kind) => match kw_kind {
+            TokenKind::Keyword(kw_kind) => match kw_kind {
                 KeywordKind::DArrow => "->",
                 KeywordKind::Eq => "=",
                 KeywordKind::Else => "else",
@@ -53,12 +50,18 @@ impl fmt::Display for TokenKind {
                 KeywordKind::Then => "then",
                 KeywordKind::Val => "val",
             }
-            Self::Semi => "semi",
-            Self::LParen => "l_paren",
-            Self::RParen => "r_paren",
-            Self::Whitespace => "whitespace",
-            Self::LineComment => "line_comment",
-            Self::BlockComment => "block_comment",
+            TokenKind::Semi => "semi",
+            TokenKind::LParen => "l_paren",
+            TokenKind::RParen => "r_paren",
+            TokenKind::Trivia(trivia_kind) => match trivia_kind {
+                TriviaKind::Whitespace => "whitespace",
+                TriviaKind::Comment(comment_kind) => {
+                    match comment_kind {
+                        CommentKind::Line => "line_comment",
+                        CommentKind::Block => "block_comment",
+                    }
+                }
+            }
             Self::Invalid => "invalid",
         })
     }
@@ -88,4 +91,14 @@ pub enum KeywordKind {
     Op,
     Then,
     Val,
+}
+
+pub enum TriviaKind {
+    Whitespace,
+    Comment(CommentKind),
+}
+
+pub enum CommentKind {
+    Line,
+    Block,
 }
