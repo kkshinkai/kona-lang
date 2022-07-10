@@ -76,6 +76,24 @@ impl<'s> SourceIter<'s> {
         }
     }
 
+    pub(crate) fn eat_if_is(&mut self, c: char) -> bool {
+        if self.peek_fst() == c {
+            self.eat();
+            true
+        } else {
+            false
+        }
+    }
+
+    pub(crate) fn eat_if(&mut self, mut predicate: impl FnMut(char) -> bool) -> bool {
+        if predicate(self.peek_fst()) && !self.is_eof() {
+            self.eat();
+            true
+        } else {
+            false
+        }
+    }
+
     pub(crate) fn is_eof(&self) -> bool {
         self.chars.as_str().is_empty()
     }

@@ -79,13 +79,90 @@ impl SourceIter<'_> {
     }
 
     fn lex_alpha_ident(&mut self) -> TokenKind {
-        debug_assert!(is_alpha_ident_head(self.eat()));
+        debug_assert!(is_alpha_ident_head(self.peek_fst()));
+
+        // Lex keywords, I'm not sure if this is a good implementation, but for
+        // now this is all I can do.
+        if self.eat_if_is('e') {
+            if self.eat_if_is('l') {
+                if self.eat_if_is('s') {
+                    if self.eat_if_is('e') {
+                        if !is_alpha_ident_body(self.peek_fst()) {
+                            return Else;
+                        }
+                    }
+                }
+            } else if self.eat_if_is('n') {
+                if self.eat_if_is('d') {
+                    if !is_alpha_ident_body(self.peek_fst()) {
+                        return End;
+                    }
+                }
+            }
+        } else if self.eat_if_is('f') {
+            if self.eat_if_is('n') {
+                if !is_alpha_ident_body(self.peek_fst()) {
+                    return Fn;
+                }
+            }
+        } else if self.eat_if_is('i') {
+            if self.eat_if_is('f') {
+                if !is_alpha_ident_body(self.peek_fst()) {
+                    return If;
+                }
+            }
+        } else if self.eat_if_is('l') {
+            if self.eat_if_is('e') {
+                if self.eat_if_is('t') {
+                    if !is_alpha_ident_body(self.peek_fst()) {
+                        return Let;
+                    }
+                }
+            }
+        } else if self.eat_if_is('o') {
+            if self.eat_if_is('p') {
+                if !is_alpha_ident_body(self.peek_fst()) {
+                    return Op;
+                }
+            }
+        } else if self.eat_if_is('t') {
+            if self.eat_if_is('h') {
+                if self.eat_if_is('e') {
+                    if !is_alpha_ident_body(self.peek_fst()) {
+                        return Then;
+                    }
+                }
+            }
+        } else if self.eat_if_is('v') {
+            if self.eat_if_is('a') {
+                if self.eat_if_is('l') {
+                    if !is_alpha_ident_body(self.peek_fst()) {
+                        return Val;
+                    }
+                }
+            }
+        }
+
+
         self.eat_while(is_alpha_ident_body);
         Ident(IdentKind::Alphanumeric)
     }
 
     fn lex_sym_ident(&mut self) -> TokenKind {
-        debug_assert!(is_sym_ident(self.eat()));
+        debug_assert!(is_sym_ident(self.peek_fst()));
+
+        if self.eat_if_is('=') {
+            if self.eat_if_is('>') {
+                if !is_sym_ident(self.peek_fst()) {
+                    return DArrow;
+                }
+            } else {
+                if !is_sym_ident(self.peek_fst()) {
+                    return Eq;
+                }
+            }
+        }
+
         self.eat_while(is_sym_ident);
         Ident(IdentKind::Symbolic)
     }
