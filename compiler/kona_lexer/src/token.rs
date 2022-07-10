@@ -58,7 +58,7 @@ impl TokenKind {
         matches!(self, TokenKind::Lit(LitKind::Bool))
     }
 
-    fn is_trivia(&self) -> bool {
+    pub fn is_trivia(&self) -> bool {
         matches!(self, TokenKind::Trivia(_))
     }
 
