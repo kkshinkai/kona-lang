@@ -3,8 +3,21 @@
 
 use crate::source_iter::SourceIter;
 use crate::char_spec::*;
-use crate::token::{IdentKind, LitKind};
+use crate::token::{IdentKind, LitKind, KeywordKind};
 use crate::token::{Token, TokenKind::{self, *}};
+
+/// Creates an iterator that produces tokens from the input string.
+pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
+    let mut iter = SourceIter::new(input);
+    std::iter::from_fn(move || {
+        if iter.is_eof() {
+            None
+        } else {
+            iter.reset_consumed_len();
+            Some(iter.lex_token())
+        }
+    })
+}
 
 impl SourceIter<'_> {
     fn lex_token(&mut self) -> Token {
@@ -36,9 +49,9 @@ impl SourceIter<'_> {
             '(' => LParen,
             ')' => RParen,
 
-            _ => unimplemented!(),
+            _ => Invalid,
         };
-        unimplemented!()
+        Token::new(kind, self.consumed_len())
     }
 
     fn lex_line_comment(&mut self) -> TokenKind {
@@ -88,48 +101,48 @@ impl SourceIter<'_> {
                 if self.eat_if_is('s') {
                     if self.eat_if_is('e') {
                         if !is_alpha_ident_body(self.peek_fst()) {
-                            return Else;
+                            return Keyword(KeywordKind::Else);
                         }
                     }
                 }
             } else if self.eat_if_is('n') {
                 if self.eat_if_is('d') {
                     if !is_alpha_ident_body(self.peek_fst()) {
-                        return End;
+                        return Keyword(KeywordKind::End);
                     }
                 }
             }
         } else if self.eat_if_is('f') {
             if self.eat_if_is('n') {
                 if !is_alpha_ident_body(self.peek_fst()) {
-                    return Fn;
+                    return Keyword(KeywordKind::Fn);
                 }
             }
         } else if self.eat_if_is('i') {
             if self.eat_if_is('f') {
                 if !is_alpha_ident_body(self.peek_fst()) {
-                    return If;
+                    return Keyword(KeywordKind::If);
                 }
             }
         } else if self.eat_if_is('l') {
             if self.eat_if_is('e') {
                 if self.eat_if_is('t') {
                     if !is_alpha_ident_body(self.peek_fst()) {
-                        return Let;
+                        return Keyword(KeywordKind::Let);
                     }
                 }
             }
         } else if self.eat_if_is('o') {
             if self.eat_if_is('p') {
                 if !is_alpha_ident_body(self.peek_fst()) {
-                    return Op;
+                    return Keyword(KeywordKind::Op);
                 }
             }
         } else if self.eat_if_is('t') {
             if self.eat_if_is('h') {
                 if self.eat_if_is('e') {
                     if !is_alpha_ident_body(self.peek_fst()) {
-                        return Then;
+                        return Keyword(KeywordKind::Then);
                     }
                 }
             }
@@ -137,7 +150,7 @@ impl SourceIter<'_> {
             if self.eat_if_is('a') {
                 if self.eat_if_is('l') {
                     if !is_alpha_ident_body(self.peek_fst()) {
-                        return Val;
+                        return Keyword(KeywordKind::Val);
                     }
                 }
             }
@@ -154,11 +167,11 @@ impl SourceIter<'_> {
         if self.eat_if_is('=') {
             if self.eat_if_is('>') {
                 if !is_sym_ident(self.peek_fst()) {
-                    return DArrow;
+                    return Keyword(KeywordKind::DArrow);
                 }
             } else {
                 if !is_sym_ident(self.peek_fst()) {
-                    return Eq;
+                    return Keyword(KeywordKind::Eq);
                 }
             }
         }
