@@ -102,8 +102,8 @@ impl fmt::Display for TokenKind {
                 TriviaKind::Eol => "eol",
                 TriviaKind::Comment(comment_kind) => {
                     match comment_kind {
-                        CommentKind::Line => "line_comment",
-                        CommentKind::Block => "block_comment",
+                        CommentKind::SingleLine => "line_comment",
+                        CommentKind::MultiLine => "block_comment",
                     }
                 }
             }
@@ -150,6 +150,6 @@ pub enum TriviaKind {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CommentKind {
-    Line,
-    Block,
+    SingleLine,
+    MultiLine,
 }

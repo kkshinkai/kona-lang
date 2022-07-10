@@ -3,36 +3,33 @@
 //
 // $ cargo run --package kona_lexer --example token_list
 
-use kona_lexer::{
-    lexing::{tokenize, LexMode},
-};
+use std::path::PathBuf;
 
-fn print_token_list(source: &str, lex_mode: LexMode) {
-    let tokens = tokenize(source, LexMode::TokenAndTrivia);
+use kona_lexer::lexing::tokenize;
+
+fn print_token_list(source: &str) {
+    let tokens = tokenize(source);
     let mut pos = 0;
 
-    println!("TokenList (lexMode = {lex_mode:?}) [");
+    println!("TokenList [");
     for token in tokens {
         let text = &source[pos..pos + token.len];
-        if lex_mode == LexMode::TokenAndTrivia || !token.kind.is_trivia() {
-            println!("    {} {:?},", token.kind, text);
-        }
+        println!("    {} {:?},", token.kind, text);
         pos += token.len;
     }
     println!("]");
 }
 
 fn main() {
-    print_token_list("fn x => x + 1", LexMode::TokenOnly);
-    print_token_list("fn x => x + 1", LexMode::TokenAndTrivia);
+    let mut src_file = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    src_file.push("examples/hello.kona");
 
-    let src = r#"
-        let
-            val sayHello = fn name => "Hello, " + name + "!";
-            val name = "Kk Shinkai";
-        in
-            println (sayHello name);
-        end
-    "#;
-    print_token_list(src, LexMode::TokenOnly);
+    let error_msg = format!(
+        "Failed to read example source file at \"{}\"",
+        src_file.display(),
+    );
+    let src = std::fs::read_to_string(src_file)
+        .expect(&error_msg);
+
+    print_token_list(&src);
 }

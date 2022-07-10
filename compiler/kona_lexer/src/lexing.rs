@@ -6,31 +6,16 @@ use crate::char_spec::*;
 use crate::token::{IdentKind, LitKind, KeywordKind, TriviaKind, CommentKind};
 use crate::token::{Token, TokenKind::{self, *}};
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum LexMode {
-    #[deprecated]
-    TokenOnly, // This mode is broken, remove it
-    TokenAndTrivia,
-}
-
 /// Creates an iterator that produces tokens from the input string.
-pub fn tokenize(input: &str, lex_mode: LexMode) -> impl Iterator<Item = Token> + '_ {
+pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
     let mut iter = SourceIter::new(input);
     std::iter::from_fn(move || {
-        while !iter.is_eof() {
+        if iter.is_eof() {
+            None
+        } else {
             iter.reset_consumed_len();
-            let next_token = iter.lex_token();
-
-            if lex_mode == LexMode::TokenOnly
-                && matches!(next_token.kind, TokenKind::Trivia(_))
-            {
-                continue;
-            } else {
-                return Some(next_token);
-            }
+            Some(iter.lex_token())
         }
-
-        None
     })
 }
 
@@ -75,7 +60,7 @@ impl SourceIter<'_> {
     fn lex_line_comment(&mut self) -> TokenKind {
         debug_assert!(self.eat() == '/' && self.eat() == '/');
         self.eat_while(|c| c != '\n');
-        Trivia(TriviaKind::Comment(CommentKind::Line))
+        Trivia(TriviaKind::Comment(CommentKind::SingleLine))
     }
 
     fn lex_block_comment(&mut self) -> TokenKind {
@@ -99,7 +84,7 @@ impl SourceIter<'_> {
             }
         }
 
-        Trivia(TriviaKind::Comment(CommentKind::Block))
+        Trivia(TriviaKind::Comment(CommentKind::MultiLine))
     }
 
     fn lex_whitespace(&mut self) -> TokenKind {
