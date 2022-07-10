@@ -5,21 +5,36 @@
 
 use kona_lexer::{
     lexing::{tokenize, LexMode},
+    token::TokenKind,
 };
 
 fn print_token_list(source: &str, lex_mode: LexMode) {
-    let tokens = tokenize(source, lex_mode);
+    let tokens = tokenize(source, LexMode::TokenAndTrivia);
     let mut pos = 0;
 
     println!("TokenList (lexMode = {lex_mode:?}) [");
     for token in tokens {
         let text = &source[pos..pos + token.len];
-        println!("    {} {:?},", token.kind, text);
+        if lex_mode == LexMode::TokenAndTrivia
+            || !matches!(token.kind, TokenKind::Trivia(_))
+        {
+            println!("    {} {:?},", token.kind, text);
+        }
         pos += token.len;
     }
     println!("]");
 }
 
 fn main() {
+    print_token_list("fn x => x + 1", LexMode::TokenOnly);
     print_token_list("fn x => x + 1", LexMode::TokenAndTrivia);
+
+    print_token_list(r#"
+        let
+            val sayHello = fn name => "Hello, " + name + "!";
+            val name = "Kk Shinkai";
+        in
+            println (sayHello name);
+        end
+    "#, LexMode::TokenOnly);
 }

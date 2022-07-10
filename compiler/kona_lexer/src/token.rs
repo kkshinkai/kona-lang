@@ -38,8 +38,8 @@ impl fmt::Display for TokenKind {
                 LitKind::Bool => "bool",
             }
             TokenKind::Keyword(kw_kind) => match kw_kind {
-                KeywordKind::DArrow => "->",
-                KeywordKind::Eq => "=",
+                KeywordKind::DArrow => "double_arrow",
+                KeywordKind::Eq => "equal",
                 KeywordKind::Else => "else",
                 KeywordKind::End => "end",
                 KeywordKind::Fn => "fn",

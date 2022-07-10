@@ -60,11 +60,11 @@ impl SourceIter<'_> {
             // String literal.
             '"' => self.lex_string(),
 
-            ';' => Semi,
-            '(' => LParen,
-            ')' => RParen,
+            ';' => { self.eat(); Semi }
+            '(' => { self.eat(); LParen }
+            ')' => { self.eat(); RParen }
 
-            _ => Invalid,
+            _ => { self.eat(); Invalid }
         };
         Token::new(kind, self.consumed_len())
     }
