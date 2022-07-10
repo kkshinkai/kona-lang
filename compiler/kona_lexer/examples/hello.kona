@@ -1,6 +1,6 @@
 let
     val sayHello = fn name => "Hello, " + name + "!";
-    val name = "Kk Shinkai";
+    val name = "Izumi";
 in
     println (sayHello name);
 end
