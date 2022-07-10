@@ -147,6 +147,10 @@ impl SourceIter<'_> {
                 if !is_alpha_ident_body(self.peek_fst()) {
                     return Keyword(KeywordKind::If);
                 }
+            } else if self.eat_if_is('n') {
+                if !is_alpha_ident_body(self.peek_fst()) {
+                    return Keyword(KeywordKind::In);
+                }
             }
         } else if self.eat_if_is('l') {
             if self.eat_if_is('e') {
