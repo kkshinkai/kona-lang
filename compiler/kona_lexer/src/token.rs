@@ -30,31 +30,31 @@ pub enum TokenKind {
 }
 
 impl TokenKind {
-    fn is_keyword(&self) -> bool {
+    pub fn is_keyword(&self) -> bool {
         matches!(self, TokenKind::Keyword(_))
     }
 
-    fn is_ident(&self) -> bool {
+    pub fn is_ident(&self) -> bool {
         matches!(self, TokenKind::Ident(_))
     }
 
-    fn is_lit(&self) -> bool {
+    pub fn is_lit(&self) -> bool {
         matches!(self, TokenKind::Lit(_))
     }
 
-    fn is_string_lit(&self) -> bool {
+    pub fn is_string_lit(&self) -> bool {
         matches!(self, TokenKind::Lit(LitKind::String))
     }
 
-    fn is_int_lit(&self) -> bool {
+    pub fn is_int_lit(&self) -> bool {
         matches!(self, TokenKind::Lit(LitKind::Int))
     }
 
-    fn is_float_lit(&self) -> bool {
+    pub fn is_float_lit(&self) -> bool {
         matches!(self, TokenKind::Lit(LitKind::Float))
     }
 
-    fn is_bool_lit(&self) -> bool {
+    pub fn is_bool_lit(&self) -> bool {
         matches!(self, TokenKind::Lit(LitKind::Bool))
     }
 
@@ -62,11 +62,11 @@ impl TokenKind {
         matches!(self, TokenKind::Trivia(_))
     }
 
-    fn is_whitespace(&self) -> bool {
+    pub fn is_whitespace(&self) -> bool {
         matches!(self, TokenKind::Trivia(TriviaKind::Whitespace))
     }
 
-    fn is_comment(&self) -> bool {
+    pub fn is_comment(&self) -> bool {
         matches!(self, TokenKind::Trivia(TriviaKind::Comment(_)))
     }
 }
