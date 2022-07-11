@@ -19,6 +19,18 @@ pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
     })
 }
 
+fn keyword_or_bool_lit(string: &str) -> Option<TokenKind> {
+    use TokenKind::*;
+
+    match string {
+        "else" => Some(Else), "end" => Some(End), "fn" => Some(Fn),
+        "if" => Some(If), "in" => Some(In), "let" => Some(Let),
+        "op" => Some(Op), "then" => Some(Then), "val" => Some(Val),
+        "true" => Some(Lit(LitKind::Bool)), "false" => Some(Lit(LitKind::Bool)),
+        "=>" => Some(DArrow), "=" => Some(Eq), _ => None
+    }
+}
+
 impl SourceIter<'_> {
     fn lex_token(&mut self) -> Token {
         let kind = match self.peek_fst() {
@@ -108,46 +120,24 @@ impl SourceIter<'_> {
         debug_assert!(is_alpha_ident_head(self.peek_fst()));
 
         let mut ident = String::new();
-
-        // The longest alphanumeric keyword or boolean literal is "false", don't
-        // cache more characters than that.
-        let mut longest = 5;
-        while is_alpha_ident_body(self.peek_fst()) && longest >= 0 {
+        while is_alpha_ident_body(self.peek_fst()) {
             ident.push(self.eat());
-            longest -= 1;
         }
 
-        match ident.as_str() {
-            "else" => Else, "end" => End, "fn" => Fn, "if" => If, "in" => In,
-            "let" => Let, "op" => Op, "then" => Then, "val" => Val,
-            "true" => Lit(LitKind::Bool), "false" => Lit(LitKind::Bool),
-            _ => {
-                self.eat_while(is_alpha_ident_body);
-                Ident(IdentKind::Alphanumeric)
-            }
-        }
+        keyword_or_bool_lit(ident.as_str())
+            .unwrap_or(Ident(IdentKind::Alphanumeric))
     }
 
     fn lex_sym_ident(&mut self) -> TokenKind {
         debug_assert!(is_sym_ident(self.peek_fst()));
 
         let mut ident = String::new();
-
-        // The longest symbolic keyword is "=>", don't cache more characters
-        // than that.
-        let mut longest = 2;
-        while is_sym_ident(self.peek_fst()) && longest >= 0 {
+        while is_sym_ident(self.peek_fst()) {
             ident.push(self.eat());
-            longest -= 1;
         }
 
-        match ident.as_str() {
-            "=>" => DArrow, "=" => Eq,
-            _ => {
-                self.eat_while(is_sym_ident);
-                Ident(IdentKind::Symbolic)
-            }
-        }
+        keyword_or_bool_lit(ident.as_str())
+            .unwrap_or(Ident(IdentKind::Symbolic))
     }
 
     fn lex_number(&mut self) -> TokenKind {
