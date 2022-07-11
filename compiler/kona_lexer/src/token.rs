@@ -84,7 +84,8 @@ impl TokenKind {
     }
 
     pub fn is_comment(&self) -> bool {
-        matches!(self, TokenKind::Trivia(TriviaKind::Comment(_)))
+        matches!(self, TokenKind::Trivia(TriviaKind::SingleLineComment)
+                     | TokenKind::Trivia(TriviaKind::MultiLineComment))
     }
 
     pub fn is_punct(&self) -> bool {
@@ -119,12 +120,8 @@ impl fmt::Display for TokenKind {
             TokenKind::Trivia(trivia_kind) => match trivia_kind {
                 TriviaKind::Whitespace => "whitespace",
                 TriviaKind::Eol => "eol",
-                TriviaKind::Comment(comment_kind) => {
-                    match comment_kind {
-                        CommentKind::SingleLine => "line_comment",
-                        CommentKind::MultiLine => "block_comment",
-                    }
-                }
+                TriviaKind::SingleLineComment => "line_comment",
+                TriviaKind::MultiLineComment => "block_comment",
             }
             Self::Invalid => "invalid",
         })
@@ -149,11 +146,6 @@ pub enum IdentKind {
 pub enum TriviaKind {
     Whitespace,
     Eol,
-    Comment(CommentKind),
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum CommentKind {
-    SingleLine,
-    MultiLine,
+    SingleLineComment,
+    MultiLineComment,
 }

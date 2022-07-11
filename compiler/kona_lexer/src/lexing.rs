@@ -3,7 +3,7 @@
 
 use crate::source_iter::SourceIter;
 use crate::char_spec::*;
-use crate::token::{IdentKind, LitKind, TriviaKind, CommentKind};
+use crate::token::{IdentKind, LitKind, TriviaKind};
 use crate::token::{Token, TokenKind::{self, *}};
 
 /// Creates an iterator that produces tokens from the input string.
@@ -60,7 +60,7 @@ impl SourceIter<'_> {
     fn lex_line_comment(&mut self) -> TokenKind {
         debug_assert!(self.eat() == '/' && self.eat() == '/');
         self.eat_while(|c| c != '\n');
-        Trivia(TriviaKind::Comment(CommentKind::SingleLine))
+        Trivia(TriviaKind::SingleLineComment)
     }
 
     fn lex_block_comment(&mut self) -> TokenKind {
@@ -84,7 +84,7 @@ impl SourceIter<'_> {
             }
         }
 
-        Trivia(TriviaKind::Comment(CommentKind::MultiLine))
+        Trivia(TriviaKind::MultiLineComment)
     }
 
     fn lex_inline_spaces(&mut self) -> TokenKind {
