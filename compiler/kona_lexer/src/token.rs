@@ -19,7 +19,18 @@ impl Token {
 pub enum TokenKind {
     Ident(IdentKind),
     Lit(LitKind),
-    Keyword(KeywordKind),
+
+    DArrow,
+    Eq,
+    Else,
+    End,
+    Fn,
+    If,
+    In,
+    Let,
+    Op,
+    Then,
+    Val,
 
     Semi,
     LParen,
@@ -31,7 +42,9 @@ pub enum TokenKind {
 
 impl TokenKind {
     pub fn is_keyword(&self) -> bool {
-        matches!(self, TokenKind::Keyword(_))
+        matches!(self, TokenKind::DArrow | TokenKind::Eq | TokenKind::Else
+            | TokenKind::End | TokenKind::Fn | TokenKind::If | TokenKind::In
+            | TokenKind::Let | TokenKind::Op | TokenKind::Then | TokenKind::Val)
     }
 
     pub fn is_ident(&self) -> bool {
@@ -66,8 +79,16 @@ impl TokenKind {
         matches!(self, TokenKind::Trivia(TriviaKind::Whitespace))
     }
 
+    pub fn is_eol(&self) -> bool {
+        matches!(self, TokenKind::Trivia(TriviaKind::Eol))
+    }
+
     pub fn is_comment(&self) -> bool {
         matches!(self, TokenKind::Trivia(TriviaKind::Comment(_)))
+    }
+
+    pub fn is_punct(&self) -> bool {
+        matches!(self, TokenKind::LParen | TokenKind::RParen | TokenKind::Semi)
     }
 }
 
@@ -81,19 +102,17 @@ impl fmt::Display for TokenKind {
                 LitKind::String => "string",
                 LitKind::Bool => "bool",
             }
-            TokenKind::Keyword(kw_kind) => match kw_kind {
-                KeywordKind::DArrow => "double_arrow",
-                KeywordKind::Eq => "equal",
-                KeywordKind::Else => "else",
-                KeywordKind::End => "end",
-                KeywordKind::Fn => "fn",
-                KeywordKind::If => "if",
-                KeywordKind::In => "in",
-                KeywordKind::Let => "let",
-                KeywordKind::Op => "op",
-                KeywordKind::Then => "then",
-                KeywordKind::Val => "val",
-            }
+            TokenKind::DArrow => "double_arrow",
+            TokenKind::Eq => "equal",
+            TokenKind::Else => "else",
+            TokenKind::End => "end",
+            TokenKind::Fn => "fn",
+            TokenKind::If => "if",
+            TokenKind::In => "in",
+            TokenKind::Let => "let",
+            TokenKind::Op => "op",
+            TokenKind::Then => "then",
+            TokenKind::Val => "val",
             TokenKind::Semi => "semi",
             TokenKind::LParen => "l_paren",
             TokenKind::RParen => "r_paren",
@@ -124,21 +143,6 @@ pub enum LitKind {
 pub enum IdentKind {
     Alphanumeric,
     Symbolic,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum KeywordKind {
-    DArrow,
-    Eq,
-    Else,
-    End,
-    Fn,
-    If,
-    In,
-    Let,
-    Op,
-    Then,
-    Val,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

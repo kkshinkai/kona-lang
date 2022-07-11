@@ -14,7 +14,7 @@ fn highlight(source: &str) {
         let text = &source[pos..pos + token.len];
 
         let color = match token.kind {
-            TokenKind::Keyword(_) => 34,
+            kind if kind.is_keyword() => 34,
             TokenKind::Lit(lit_kind) => match lit_kind {
                 LitKind::String => 32,
                 LitKind::Int => 36,
