@@ -76,17 +76,6 @@ impl<'s> SourceIter<'s> {
         }
     }
 
-    pub(crate) fn eat_seq(&mut self, chars: &str) -> bool {
-        for c in chars.chars() {
-            if self.peek_fst() == c {
-                self.eat();
-            } else {
-                return false;
-            }
-        }
-        true
-    }
-
     pub(crate) fn is_eof(&self) -> bool {
         self.chars.as_str().is_empty()
     }

@@ -107,83 +107,47 @@ impl SourceIter<'_> {
     fn lex_alpha_ident(&mut self) -> TokenKind {
         debug_assert!(is_alpha_ident_head(self.peek_fst()));
 
-        // Lex keywords and boolean literals, I'm not sure if this is a good
-        // implementation, but for now this is all I can do.
-        if self.eat_seq("e") {
-            if self.eat_seq("lse") {
-                if !is_alpha_ident_body(self.peek_fst()) {
-                    return Else;
-                }
-            } else if self.eat_seq("nd") {
-                if !is_alpha_ident_body(self.peek_fst()) {
-                    return End;
-                }
-            }
-        } else if self.eat_seq("f") {
-            if self.eat_seq("alse") {
-                if !is_alpha_ident_body(self.peek_fst()) {
-                    return Lit(LitKind::Bool);
-                }
-            } else if self.eat_seq("n") {
-                if !is_alpha_ident_body(self.peek_fst()) {
-                    return Fn;
-                }
-            }
-        } else if self.eat_seq("i") {
-            if self.eat_seq("f") {
-                if !is_alpha_ident_body(self.peek_fst()) {
-                    return If;
-                }
-            } else if self.eat_seq("n") {
-                if !is_alpha_ident_body(self.peek_fst()) {
-                    return In;
-                }
-            }
-        } else if self.eat_seq("let") {
-            if !is_alpha_ident_body(self.peek_fst()) {
-                return Let;
-            }
-        } else if self.eat_seq("op") {
-            if !is_alpha_ident_body(self.peek_fst()) {
-                return Op;
-            }
-        } else if self.eat_seq("t") {
-            if self.eat_seq("hen") {
-                if !is_alpha_ident_body(self.peek_fst()) {
-                    return Then;
-                }
-            } else if self.eat_seq("rue") {
-                if !is_alpha_ident_body(self.peek_fst()) {
-                    return Lit(LitKind::Bool);
-                }
-            }
-        } else if self.eat_seq("val") {
-            if !is_alpha_ident_body(self.peek_fst()) {
-                return Val;
-            }
+        let mut ident = String::new();
+
+        // The longest alphanumeric keyword or boolean literal is "false", don't
+        // cache more characters than that.
+        let mut longest = 5;
+        while is_alpha_ident_body(self.peek_fst()) && longest >= 0 {
+            ident.push(self.eat());
+            longest -= 1;
         }
 
-        self.eat_while(is_alpha_ident_body);
-        Ident(IdentKind::Alphanumeric)
+        match ident.as_str() {
+            "else" => Else, "end" => End, "fn" => Fn, "if" => If, "in" => In,
+            "let" => Let, "op" => Op, "then" => Then, "val" => Val,
+            "true" => Lit(LitKind::Bool), "false" => Lit(LitKind::Bool),
+            _ => {
+                self.eat_while(is_alpha_ident_body);
+                Ident(IdentKind::Alphanumeric)
+            }
+        }
     }
 
     fn lex_sym_ident(&mut self) -> TokenKind {
         debug_assert!(is_sym_ident(self.peek_fst()));
 
-        if self.eat_seq("=") {
-            if self.eat_seq(">") {
-                if !is_sym_ident(self.peek_fst()) {
-                    return DArrow;
-                }
-            } else {
-                if !is_sym_ident(self.peek_fst()) {
-                    return Eq;
-                }
-            }
+        let mut ident = String::new();
+
+        // The longest symbolic keyword is "=>", don't cache more characters
+        // than that.
+        let mut longest = 2;
+        while is_sym_ident(self.peek_fst()) && longest >= 0 {
+            ident.push(self.eat());
+            longest -= 1;
         }
 
-        self.eat_while(is_sym_ident);
-        Ident(IdentKind::Symbolic)
+        match ident.as_str() {
+            "=>" => DArrow, "=" => Eq,
+            _ => {
+                self.eat_while(is_sym_ident);
+                Ident(IdentKind::Symbolic)
+            }
+        }
     }
 
     fn lex_number(&mut self) -> TokenKind {
