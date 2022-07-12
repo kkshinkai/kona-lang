@@ -3,7 +3,7 @@ The Kona Programming Language
 
 [![License: MIT][mit-badge]][mit-url]
 
-Miracles and magic are real.
+An experimental functional programming language of the ML family.
 
 License
 -------
