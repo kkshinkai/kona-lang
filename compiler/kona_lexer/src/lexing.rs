@@ -21,21 +21,6 @@ pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
     })
 }
 
-/// Checks if the given identifier is a keyword or boolean literal. Returns the
-/// corresponding token kind if it is, or `None` otherwise.
-fn keyword_or_bool_lit(string: &str) -> Option<TokenKind> {
-    use TokenKind::*;
-
-    let keyword_table = [
-        ("else", Else), ("end", End), ("fn", Fn), ("if", If), ("in", In),
-        ("let", Let), ("op", Op), ("then", Then), ("val", Val),
-        ("true", Lit(LitKind::Bool)), ("false", Lit(LitKind::Bool)),
-        ("=>", DArrow), ("=", Eq),
-    ].into_iter().collect::<HashMap<_, _>>();
-
-    keyword_table.get(string).cloned()
-}
-
 impl SourceIter<'_> {
     fn lex_token(&mut self) -> Token {
         let kind = match self.peek_fst() {
@@ -174,4 +159,19 @@ impl SourceIter<'_> {
 
         Lit(LitKind::String)
     }
+}
+
+/// Checks if the given identifier is a keyword or boolean literal. Returns the
+/// corresponding token kind if it is, or `None` otherwise.
+fn keyword_or_bool_lit(string: &str) -> Option<TokenKind> {
+    use TokenKind::*;
+
+    let keyword_table = [
+        ("else", Else), ("end", End), ("fn", Fn), ("if", If), ("in", In),
+        ("let", Let), ("op", Op), ("then", Then), ("val", Val),
+        ("true", Lit(LitKind::Bool)), ("false", Lit(LitKind::Bool)),
+        ("=>", DArrow), ("=", Eq),
+    ].into_iter().collect::<HashMap<_, _>>();
+
+    keyword_table.get(string).cloned()
 }
