@@ -18,13 +18,14 @@ impl Interval {
     /// # Examples
     ///
     /// ```
-    /// # use kona_source::interval::Interval;
+    /// # use kona_source::interval::*;
+    /// # use kona_source::pos::*;
     /// let interval = Interval::new(
-    ///     Pos::from_uszie(0),
-    ///     Pos::from_uszie(5),
+    ///     Pos::from_usize(0),
+    ///     Pos::from_usize(5),
     /// );
-    /// assert_eq!(interval.start(), Pos::from_uszie(0));
-    /// assert_eq!(interval.end(), Pos::from_uszie(5));
+    /// assert_eq!(interval.start(), Pos::from_usize(0));
+    /// assert_eq!(interval.end(), Pos::from_usize(5));
     /// ```
     ///
     /// # Panics
@@ -52,13 +53,13 @@ impl Interval {
     /// # Examples
     ///
     /// ```
-    /// # use kona_source::interval::Interval;
+    /// # use kona_source::interval::*;
     /// let dummy_interval = Interval::dummy();
     /// assert!(dummy_interval.is_dummy());
     /// ```
     pub fn dummy() -> Interval {
         let zero = Pos::from_usize(0);
-        Interval::new(zero, zero)
+        Interval { start: zero, end: zero }
     }
 
     /// Checks if the interval is dummy.
