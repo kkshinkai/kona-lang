@@ -12,15 +12,15 @@ pub struct SourceFile {
     path: FilePath,
 
     /// The source code in the file.
-    src: Rc<String>,
+    pub src: Rc<String>,
 
     /// The start position of this source in the file.
     ///
     /// Each file is assigned a unique index range, see [`Pos`] for details.
-    start_pos: Pos,
+    pub start_pos: Pos,
 
     /// The end position of this source in the file.
-    end_pos: Pos,
+    pub end_pos: Pos,
 
     /// Caches the start of each line in the source file.
     ///

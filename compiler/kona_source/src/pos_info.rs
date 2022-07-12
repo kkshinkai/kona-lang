@@ -14,17 +14,25 @@ use crate::source_file::{SourceFile, FilePath};
 #[derive(Clone, PartialEq, Eq)]
 pub struct PosInfo {
     /// Information about the original source.
-    file: Rc<SourceFile>, // TBD: we don't need all these information, why not
-                          // just `FilePath`?
+    pub file: Rc<SourceFile>, // TBD: we don't need all these information, why
+                              // not just `FilePath`?
 
     /// The 1-based line number.
-    line: usize,
+    pub line: usize,
 
     /// The 0-based column offset.
-    col: usize,
+    pub col: usize,
 
     /// The 0-based column offset when displayed.
-    col_display: usize,
+    pub col_display: usize,
+}
+
+impl PosInfo {
+    /// Creates a new [`PosInfo`] with the given file, line, column, and column
+    /// offset when displayed.
+    pub fn new(file: Rc<SourceFile>, line: usize, col: usize, col_display: usize) -> PosInfo {
+        PosInfo { file, line, col, col_display }
+    }
 }
 
 impl fmt::Debug for PosInfo {

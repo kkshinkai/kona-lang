@@ -7,8 +7,8 @@ use crate::pos::Pos;
 
 #[derive(Copy, Clone, PartialEq, Eq, Hash)]
 pub struct Interval {
-    start: Pos,
-    end: Pos,
+    pub start: Pos,
+    pub end: Pos,
 }
 
 impl Interval {
