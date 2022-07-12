@@ -10,7 +10,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "kona_lexer"
+name = "kona_lex"
 version = "0.1.0"
 dependencies = [
  "lazy_static",

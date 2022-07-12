@@ -1,10 +1,10 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 //
-// $ cargo run --package kona_lexer --example highlight
+// $ cargo run --package kona_lex --example highlight
 
 use std::path::PathBuf;
-use kona_lexer::{lexing::tokenize, token::{TokenKind, LitKind, TriviaKind}};
+use kona_lex::{lexing::tokenize, token::{TokenKind, LitKind, TriviaKind}};
 
 fn highlight(source: &str) {
     let tokens = tokenize(source);

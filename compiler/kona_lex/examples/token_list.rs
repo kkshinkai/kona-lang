@@ -1,11 +1,11 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 //
-// $ cargo run --package kona_lexer --example token_list
+// $ cargo run --package kona_lex --example token_list
 
 use std::path::PathBuf;
 
-use kona_lexer::lexing::tokenize;
+use kona_lex::lexing::tokenize;
 
 fn print_token_list(source: &str) {
     let tokens = tokenize(source);
