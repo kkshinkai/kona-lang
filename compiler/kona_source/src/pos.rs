@@ -1,9 +1,13 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
-use std::{ops::{Add, Sub}, fmt};
+use std::fmt;
+use std::ops::{Add, Sub};
 
-/// A unique locator for bytes in the source code.
+/// An index for random access in all source code (a branch of source files) in
+/// a source map.
+///
+/// TODO: Update the description.
 ///
 /// [`Pos`] use an [`usize`] integer to represent the position of a byte. Each
 /// source file is given a unique interval by the source code manager
