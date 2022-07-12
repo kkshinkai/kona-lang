@@ -4,7 +4,7 @@
 // $ cargo run --package kona_lex --example highlight
 
 use std::path::PathBuf;
-use kona_lex::{lexing::tokenize, token::{TokenKind, LitKind, TriviaKind, IdentKind}};
+use kona_lex::{lexing::tokenize, token::{TokenKind, LitKind, IdentKind}};
 
 /// Gets 256-color mode color (`ESC[38;5;#m`) for a token kind.
 fn get_color(kind: TokenKind) -> Option<u8> {
