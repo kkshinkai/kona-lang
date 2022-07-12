@@ -12,8 +12,8 @@ pub struct SourceMgr {
     used_pos_space: usize,
 
     // WARNING: Don't modify `used_pos_space` directly. Don't add new functions
-    // that might modify or access it. `allocate_new_interval` should be the
-    // only function that can increase and get `used_pos_space`.
+    // that might modify or access it. `allocate_pos_space` should be the
+    // only function that can increase `used_pos_space`.
 
     /// The source files.
     files: Vec<Rc<SourceFile>>,
