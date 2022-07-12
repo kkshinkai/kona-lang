@@ -4,7 +4,26 @@
 // $ cargo run --package kona_lex --example highlight
 
 use std::path::PathBuf;
-use kona_lex::{lexing::tokenize, token::{TokenKind, LitKind, TriviaKind}};
+use kona_lex::{lexing::tokenize, token::{TokenKind, LitKind, TriviaKind, IdentKind}};
+
+/// Gets 256-color mode color (`ESC[38;5;#m`) for a token kind.
+fn get_color(kind: TokenKind) -> Option<u8> {
+    match kind {
+        _ if kind.is_alphanumeric_keyword() => Some(125),
+        _ if kind.is_symbolic_keyword() => Some(18),
+        _ if kind.is_punct() => Some(219),
+        _ if kind.is_comment() => Some(246),
+        TokenKind::Ident(IdentKind::Alphanumeric) => Some(98),
+        TokenKind::Ident(IdentKind::Symbolic) => Some(75),
+        TokenKind::Lit(lit_kind) => match lit_kind {
+            LitKind::Int => Some(155),
+            LitKind::Float => Some(155),
+            LitKind::String { .. } => Some(178),
+            LitKind::Bool => Some(202),
+        },
+        _ => None,
+    }
+}
 
 fn highlight(source: &str) {
     let tokens = tokenize(source);
@@ -13,21 +32,12 @@ fn highlight(source: &str) {
     for token in tokens {
         let text = &source[pos..pos + token.len];
 
-        let color = match token.kind {
-            kind if kind.is_keyword() => 34,
-            TokenKind::Lit(lit_kind) => match lit_kind {
-                LitKind::String { .. } => 32,
-                LitKind::Int => 36,
-                LitKind::Float => 36,
-                LitKind::Bool => 33,
-            },
-            TokenKind::Invalid => 31,
-            TokenKind::Trivia(TriviaKind::MultiLineComment { .. }
-                             | TriviaKind::SingleLineComment) => 30,
-            _ => 0,
-        };
+        if let Some(color) = get_color(token.kind) {
+            print!("\x1b[38;5;{}m{}\x1b[0m", color, text);
+        } else {
+            print!("{}", text);
+        }
 
-        print!("\x1b[{}m{}\x1b[0m", color, text);
         pos += token.len;
     }
     println!("");

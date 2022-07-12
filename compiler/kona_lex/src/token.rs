@@ -47,6 +47,16 @@ impl TokenKind {
             | TokenKind::Let | TokenKind::Op | TokenKind::Then | TokenKind::Val)
     }
 
+    pub fn is_symbolic_keyword(&self) -> bool {
+        matches!(self, TokenKind::DArrow | TokenKind::Eq)
+    }
+
+    pub fn is_alphanumeric_keyword(&self) -> bool {
+        matches!(self, TokenKind::Else | TokenKind::End | TokenKind::Fn
+            | TokenKind::If | TokenKind::In | TokenKind::Let | TokenKind::Op
+            | TokenKind::Then | TokenKind::Val)
+    }
+
     pub fn is_ident(&self) -> bool {
         matches!(self, TokenKind::Ident(_))
     }
