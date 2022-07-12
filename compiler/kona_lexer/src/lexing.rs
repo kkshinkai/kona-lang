@@ -75,7 +75,7 @@ impl SourceIter<'_> {
                     self.eat();
                     depth += 1;
                 }
-                '*' if self.peek_fst() == '-' => {
+                '-' if self.peek_fst() == '/' => {
                     self.eat();
                     depth -= 1;
                     if depth == 0 {
