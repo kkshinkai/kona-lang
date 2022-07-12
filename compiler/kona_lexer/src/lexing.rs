@@ -42,13 +42,20 @@ lazy_static! {
 impl SourceIter<'_> {
     fn lex_token(&mut self) -> Token {
         let kind = match self.peek_fst() {
-            // Line comment, block comment, or symbolic identifier start
-            // with '/'.
-            '/' => match self.peek_snd() {
-                '/' => self.lex_line_comment(),
-                '-' => self.lex_block_comment(),
-                _ => self.lex_sym_ident(),
-            },
+            // Block comment or symbolic identifier start with '/'.
+            '/' if self.peek_snd() == '-' => self.lex_block_comment(),
+
+            // Line comment or symbolic identifier start with '--'.
+            '-' if self.peek_snd() == '-' => {
+                let next = self.peek_trd();
+                if is_inline_space(next) || is_linebreak(next) {
+                    self.lex_line_comment()
+                } else {
+                    self.lex_sym_ident()
+                }
+            }
+
+            c if is_sym_ident(c) => self.lex_sym_ident(),
 
             // Whitespace sequence.
             c if is_inline_space(c) => self.lex_inline_spaces(),
@@ -78,7 +85,7 @@ impl SourceIter<'_> {
     }
 
     fn lex_line_comment(&mut self) -> TokenKind {
-        debug_assert!(self.eat() == '/' && self.eat() == '/');
+        debug_assert!(self.eat() == '-' && self.eat() == '-');
         self.eat_while(|c| c != '\n');
         Trivia(TriviaKind::SingleLineComment)
     }
@@ -97,14 +104,16 @@ impl SourceIter<'_> {
                     self.eat();
                     depth -= 1;
                     if depth == 0 {
-                        break;
+                        return Trivia(TriviaKind::MultiLineComment {
+                            terminated: true,
+                        });
                     }
                 }
                 _ => (),
             }
         }
 
-        Trivia(TriviaKind::MultiLineComment)
+        Trivia(TriviaKind::MultiLineComment { terminated: false })
     }
 
     fn lex_inline_spaces(&mut self) -> TokenKind {
@@ -171,7 +180,7 @@ impl SourceIter<'_> {
 
         while let Some(c) = self.next() {
             match c {
-                '"' => break,
+                '"' => return Lit(LitKind::String { terminated: true }),
                 '\\' if self.peek_fst() == '\\' && self.peek_fst() == '"' => {
                     self.eat();
                 }
@@ -179,6 +188,6 @@ impl SourceIter<'_> {
             }
         }
 
-        Lit(LitKind::String)
+        Lit(LitKind::String { terminated: false })
     }
 }

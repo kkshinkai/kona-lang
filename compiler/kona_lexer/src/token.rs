@@ -56,7 +56,7 @@ impl TokenKind {
     }
 
     pub fn is_string_lit(&self) -> bool {
-        matches!(self, TokenKind::Lit(LitKind::String))
+        matches!(self, TokenKind::Lit(LitKind::String { .. }))
     }
 
     pub fn is_int_lit(&self) -> bool {
@@ -85,11 +85,21 @@ impl TokenKind {
 
     pub fn is_comment(&self) -> bool {
         matches!(self, TokenKind::Trivia(TriviaKind::SingleLineComment)
-                     | TokenKind::Trivia(TriviaKind::MultiLineComment))
+                     | TokenKind::Trivia(TriviaKind::MultiLineComment { .. }))
     }
 
     pub fn is_punct(&self) -> bool {
         matches!(self, TokenKind::LParen | TokenKind::RParen | TokenKind::Semi)
+    }
+
+    pub fn is_invalid(&self) -> bool {
+        matches!(self, TokenKind::Invalid
+            | TokenKind::Trivia(TriviaKind::MultiLineComment { terminated: false })
+            | TokenKind::Lit(LitKind::String { terminated: false }))
+    }
+
+    pub fn is_valid(&self) -> bool {
+        !self.is_invalid()
     }
 }
 
@@ -100,7 +110,7 @@ impl fmt::Display for TokenKind {
             TokenKind::Lit(lit_kind) => match lit_kind {
                 LitKind::Int => "int",
                 LitKind::Float => "float",
-                LitKind::String => "string",
+                LitKind::String { .. } => "string",
                 LitKind::Bool => "bool",
             }
             TokenKind::DArrow => "double_arrow",
@@ -121,7 +131,7 @@ impl fmt::Display for TokenKind {
                 TriviaKind::Whitespace => "whitespace",
                 TriviaKind::Eol => "eol",
                 TriviaKind::SingleLineComment => "line_comment",
-                TriviaKind::MultiLineComment => "block_comment",
+                TriviaKind::MultiLineComment { .. } => "block_comment",
             }
             Self::Invalid => "invalid",
         })
@@ -132,7 +142,7 @@ impl fmt::Display for TokenKind {
 pub enum LitKind {
     Int,
     Float,
-    String,
+    String { terminated: bool },
     Bool,
 }
 
@@ -147,5 +157,5 @@ pub enum TriviaKind {
     Whitespace,
     Eol,
     SingleLineComment,
-    MultiLineComment,
+    MultiLineComment { terminated: bool },
 }

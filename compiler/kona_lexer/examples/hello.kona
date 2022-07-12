@@ -1,3 +1,6 @@
+-- Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
+-- root for license information.
+
 let
     val sayHello = fn name => "Hello, " + name + "!";
     val name = "Izumi";

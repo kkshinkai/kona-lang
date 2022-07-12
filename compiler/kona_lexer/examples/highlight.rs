@@ -4,7 +4,7 @@
 // $ cargo run --package kona_lexer --example highlight
 
 use std::path::PathBuf;
-use kona_lexer::{lexing::tokenize, token::{TokenKind, LitKind}};
+use kona_lexer::{lexing::tokenize, token::{TokenKind, LitKind, TriviaKind}};
 
 fn highlight(source: &str) {
     let tokens = tokenize(source);
@@ -16,13 +16,14 @@ fn highlight(source: &str) {
         let color = match token.kind {
             kind if kind.is_keyword() => 34,
             TokenKind::Lit(lit_kind) => match lit_kind {
-                LitKind::String => 32,
+                LitKind::String { .. } => 32,
                 LitKind::Int => 36,
                 LitKind::Float => 36,
                 LitKind::Bool => 33,
             },
             TokenKind::Invalid => 31,
-            TokenKind::Semi | TokenKind::LParen | TokenKind::RParen => 30,
+            TokenKind::Trivia(TriviaKind::MultiLineComment { .. }
+                             | TriviaKind::SingleLineComment) => 30,
             _ => 0,
         };
 

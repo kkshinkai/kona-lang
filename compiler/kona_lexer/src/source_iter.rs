@@ -66,6 +66,14 @@ impl<'s> SourceIter<'s> {
         iter.next().unwrap_or(EOF_CHAR)
     }
 
+    pub(crate) fn peek_trd(&self) -> char {
+        let mut iter = self.chars.clone();
+        iter.next();
+        iter.next();
+        iter.next().unwrap_or(EOF_CHAR)
+    }
+
+
     pub(crate) fn eat(&mut self) -> char {
         self.chars.next().unwrap_or(EOF_CHAR)
     }
