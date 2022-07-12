@@ -30,8 +30,8 @@ impl fmt::Debug for Pos {
 // is meaningless, just like adding two raw pointers. Implement `Add<usize>`
 // and `Sub<usize>` instead, here `usize` is considered as offset.
 //
-//     add, sub: Fn (Pos, usize) -> Pos   // ✓
-//     add, sub: Fn (Pos, Pos) -> Pos     // ✗
+//     add, sub: Fn(Pos, usize) -> Pos   // ✓
+//     add, sub: Fn(Pos, Pos) -> Pos     // ✗
 
 impl Add<usize> for Pos {
     type Output = Pos;

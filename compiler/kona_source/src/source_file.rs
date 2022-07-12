@@ -1,9 +1,9 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
-use std::{path::PathBuf, rc::Rc};
+use std::{path::PathBuf, rc::Rc, ops::Range};
 
-use crate::pos::Pos;
+use crate::{pos::Pos, source_analyzer};
 
 /// Represents a source file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -48,6 +48,103 @@ pub struct SourceFile {
 impl SourceFile {
     pub fn path(&self) -> &FilePath {
         &self.path
+    }
+}
+
+impl SourceFile {
+    /// Creates a new source file from the given path and source code.
+    pub fn new(path: FilePath, src: Rc<String>, start_pos: Pos) -> SourceFile {
+        let end_pos = start_pos + src.len();
+        let (lines, multi_byte_chars, non_narrow_chars) =
+            source_analyzer::analyze(&src, start_pos);
+        SourceFile {
+            src, path, start_pos, end_pos, lines,
+            multi_byte_chars, non_narrow_chars,
+        }
+    }
+
+    /// Finds the line containing the given position.
+    ///
+    /// The return value is the index into the `lines` array of this
+    /// `SourceFile`, not the 1-based line number. If the source file is empty
+    /// or the position is located before the first line, `None` is returned.
+    pub fn lookup_line(&self, pos: Pos) -> Option<usize> {
+        match self.lines.binary_search(&pos) {
+            Ok(index) => Some(index),
+            Err(0) => None,
+            Err(index) => Some(index - 1),
+        }
+    }
+
+    pub fn lookup_line_bounds(&self, line_index: usize) -> Range<Pos> {
+        if self.is_empty() {
+            return self.start_pos..self.end_pos;
+        }
+
+        assert!(line_index < self.lines.len());
+        if line_index == (self.lines.len() - 1) {
+            self.lines[line_index]..self.end_pos
+        } else {
+            self.lines[line_index]..self.lines[line_index + 1]
+        }
+    }
+
+
+    /// Looks up the file's 1-based line number and 0-based column offset, for a
+    /// given [`Pos`].
+    pub fn lookup_line_and_col(&self, pos: Pos) -> (usize, usize) {
+        if let Some(line) = self.lookup_line(pos) {
+            let line_start = self.lines[line];
+            let col = {
+                let linebpos = self.lines[line];
+                let start_idx = self.multi_byte_chars
+                    .binary_search_by_key(&linebpos, |x| x.pos())
+                    .unwrap_or_else(|x| x);
+                let extra_byte = self
+                    .multi_byte_chars[start_idx..]
+                    .iter()
+                    .take_while(|x| x.pos() < pos)
+                    .map(|x| x.len() as usize - 1)
+                    .sum::<usize>();
+                pos.to_usize() - line_start.to_usize() - extra_byte
+            };
+            (line + 1, col)
+        } else {
+            (0, 0)
+        }
+    }
+
+    pub fn lookup_line_col_and_col_display(
+        &self, pos: Pos
+    ) -> (usize, usize, usize) {
+        let (line, col) = self.lookup_line_and_col(pos);
+        let col_display = {
+            let linebpos = self.lines[line - 1];
+            let start_idx = self
+                .non_narrow_chars
+                .binary_search_by_key(&linebpos, |x| x.pos())
+                .unwrap_or_else(|x| x);
+            let non_narrow = self
+                .non_narrow_chars[start_idx..]
+                .iter()
+                .take_while(|x| x.pos() < pos);
+            let width = non_narrow.clone()
+                .map(|x| x.width())
+                .sum::<usize>();
+            let count = non_narrow.count();
+            col + width - count
+        };
+        (line, col, col_display)
+    }
+
+    #[inline]
+    pub fn contains(&self, pos: Pos) -> bool {
+        pos >= self.start_pos && pos <= self.end_pos
+    }
+
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.start_pos == self.end_pos
     }
 }
 
