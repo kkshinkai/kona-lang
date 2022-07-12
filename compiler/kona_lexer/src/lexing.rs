@@ -1,6 +1,8 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
+use std::collections::HashMap;
+
 use crate::source_iter::SourceIter;
 use crate::char_spec::*;
 use crate::token::{IdentKind, LitKind, TriviaKind};
@@ -19,16 +21,19 @@ pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
     })
 }
 
+/// Checks if the given identifier is a keyword or boolean literal. Returns the
+/// corresponding token kind if it is, or `None` otherwise.
 fn keyword_or_bool_lit(string: &str) -> Option<TokenKind> {
     use TokenKind::*;
 
-    match string {
-        "else" => Some(Else), "end" => Some(End), "fn" => Some(Fn),
-        "if" => Some(If), "in" => Some(In), "let" => Some(Let),
-        "op" => Some(Op), "then" => Some(Then), "val" => Some(Val),
-        "true" => Some(Lit(LitKind::Bool)), "false" => Some(Lit(LitKind::Bool)),
-        "=>" => Some(DArrow), "=" => Some(Eq), _ => None
-    }
+    let keyword_table = [
+        ("else", Else), ("end", End), ("fn", Fn), ("if", If), ("in", In),
+        ("let", Let), ("op", Op), ("then", Then), ("val", Val),
+        ("true", Lit(LitKind::Bool)), ("false", Lit(LitKind::Bool)),
+        ("=>", DArrow), ("=", Eq),
+    ].into_iter().collect::<HashMap<_, _>>();
+
+    keyword_table.get(string).cloned()
 }
 
 impl SourceIter<'_> {
@@ -120,7 +125,7 @@ impl SourceIter<'_> {
         debug_assert!(is_alpha_ident_head(self.peek_fst()));
 
         let mut ident = String::new();
-        while is_alpha_ident_body(self.peek_fst()) {
+        while is_alpha_ident_part(self.peek_fst()) {
             ident.push(self.eat());
         }
 
