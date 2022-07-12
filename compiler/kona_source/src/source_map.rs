@@ -5,8 +5,17 @@ use std::{rc::Rc, collections::HashMap, path::PathBuf, io, fs};
 
 use crate::{source_file::{SourceFile, FilePath}, pos::Pos, pos_info::PosInfo, interval::Interval};
 
+/// Source map for a compilation unit, including a bunch of source files, source
+/// code, and position information.
+///
+/// [`SourceMap`] is the top-level interface for source code management. It
+/// manages a collection of [`SourceFile`]s and the source code within them.
+/// [`SourceMap`] provides a position assignment mechanism that allocates a
+/// unique position [`Pos`] for each byte in the source code. You can get a
+/// human-readable information [`PosInfo`] with a [`Pos`], or read a span of
+/// source code with a [`Interval`] in source map.
 #[derive(Debug, Clone, PartialEq)]
-pub struct SourceMgr {
+pub struct SourceMap {
     /// The used position index, for allocating individual position intervals to
     /// source files.
     used_pos_space: usize,
@@ -22,9 +31,9 @@ pub struct SourceMgr {
     files_map: HashMap<FilePath, Rc<SourceFile>>,
 }
 
-impl SourceMgr {
+impl SourceMap {
     pub fn new() -> Self {
-        SourceMgr {
+        SourceMap {
             used_pos_space: 0,
             files: Vec::new(),
             files_map: HashMap::new(),
@@ -121,7 +130,7 @@ mod tests {
 
     #[test]
     fn test_loc_single_file1() {
-        let mut mgr = SourceMgr::new();
+        let mut mgr = SourceMap::new();
         mgr.load_virtual_file(
             "example.scm".to_string(),
             "abcdefghi".to_string(),
@@ -135,7 +144,7 @@ mod tests {
 
     #[test]
     fn test_loc_single_file2() {
-        let mut mgr = SourceMgr::new();
+        let mut mgr = SourceMap::new();
         mgr.load_virtual_file(
             "example".to_string(),
             "abc\ndef\nghi".to_string(),
@@ -149,7 +158,7 @@ mod tests {
 
     #[test]
     fn test_loc_single_file3() {
-        let mut mgr = SourceMgr::new();
+        let mut mgr = SourceMap::new();
         mgr.load_virtual_file(
             "example".to_string(),
             "🌊🌊🌊\n🌊🌊🌊\n🌊🌊🌊".to_string(),
@@ -163,7 +172,7 @@ mod tests {
 
     #[test]
     fn test_lookup_source() {
-        let mut mgr = SourceMgr::new();
+        let mut mgr = SourceMap::new();
         mgr.load_virtual_file(
             "example".to_string(),
             "abcdefghijklmn".to_string(),
