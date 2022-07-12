@@ -4,21 +4,17 @@
 use std::fmt;
 use std::ops::{Add, Sub};
 
-/// An index for random access in all source code (a branch of source files) in
-/// a source map.
+/// Represents a position in source code (a branch of source files in a source
+/// map).
 ///
-/// TODO: Update the description.
+/// The source code manager assigns each file a contiguous interval [start, end)
+/// that does not intersect with each other. The `usize` number in `Pos` is the
+/// [`start_pos`] of that file adding the offset (aka. the index of that byte
+/// in source file). With this `Pos`, you can find all information you need in
+/// the [`SourceMap`], the file name, the source character, the line and column
+/// numbers...
 ///
-/// [`Pos`] use an [`usize`] integer to represent the position of a byte. Each
-/// source file is given a unique interval by the source code manager
-/// [`SourceMap`]. [`Pos`] is therefore unique and can be used to pinpoint a
-/// byte in multiple source files.
-///
-/// The source map keeps the starting [`Pos`] of each source file. The distance
-/// between a [`Pos`] and the start of the file it is in, is its index in the
-/// current source string.
-///
-/// For example:
+/// Here is a simple example:
 ///
 /// ```text
 ///  idx1                idx2                    idx3            idx4
@@ -29,9 +25,14 @@ use std::ops::{Add, Sub};
 /// We can infer that `pos` is in file2 because `idx2 <= pos < idx3`, the byte
 /// at `pos` is then `file2.bytes[pos - idx2]`.
 ///
+/// You can also get a sub-string of the source code by using [`Interval`],
+/// a range of `Pos`.
+///
 /// TODO: Improve this document, we need a more understandable explanation.
 ///
+/// [`start_pos`]: crate::source_file::SourceFile::start_pos
 /// [`SourceMap`]: crate::source_map::SourceMap
+/// [`Interval`]: crate::interval::Interval
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Pos {
     index: usize,
