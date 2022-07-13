@@ -13,7 +13,7 @@ use crate::{source_file::{SourceFile, FilePath}, pos::Pos, pos_info::PosInfo};
 /// [`SourceMap`] provides a position assignment mechanism that allocates a
 /// unique position [`Pos`] for each byte in the source code. You can get a
 /// human-readable information [`PosInfo`] with a [`Pos`], or read a span of
-/// source code with a [`Interval`] in source map.
+/// source code with a [`Range<Pos>`] in source map.
 #[derive(Debug, Clone, PartialEq)]
 pub struct SourceMap {
     /// The used position index, for allocating individual position intervals to

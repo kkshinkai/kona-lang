@@ -53,7 +53,7 @@ impl SourceFile {
 
 impl SourceFile {
     /// Creates a new source file from the given path and source code.
-    pub fn new(path: FilePath, src: Rc<String>, start_pos: Pos) -> SourceFile {
+    pub(crate) fn new(path: FilePath, src: Rc<String>, start_pos: Pos) -> SourceFile {
         let end_pos = start_pos + src.len();
         let (lines, multi_byte_chars, non_narrow_chars) =
             source_analyzer::analyze(&src, start_pos);
