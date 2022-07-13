@@ -5,6 +5,5 @@ mod source_analyzer;
 
 pub mod pos;
 pub mod pos_info;
-pub mod interval;
 pub mod source_file;
 pub mod source_map;

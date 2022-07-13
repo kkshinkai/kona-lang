@@ -1,9 +1,9 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
-use std::{rc::Rc, collections::HashMap, path::PathBuf, io, fs};
+use std::{rc::Rc, collections::HashMap, path::PathBuf, io, fs, ops::Range};
 
-use crate::{source_file::{SourceFile, FilePath}, pos::Pos, pos_info::PosInfo, interval::Interval};
+use crate::{source_file::{SourceFile, FilePath}, pos::Pos, pos_info::PosInfo};
 
 /// Source map for a compilation unit, including a bunch of source files, source
 /// code, and position information.
@@ -114,11 +114,11 @@ impl SourceMap {
     }
 
     /// Returns the source file at the given interval.
-    pub fn lookup_source(&self, interval: Interval) -> String {
-        let file = self.lookup_file(interval.start);
+    pub fn lookup_source(&self, range: Range<Pos>) -> String {
+        let file = self.lookup_file(range.start);
 
-        let start = interval.start.to_usize() - file.start_pos.to_usize();
-        let end = interval.end.to_usize() - file.start_pos.to_usize();
+        let start = range.start.to_usize() - file.start_pos.to_usize();
+        let end = range.end.to_usize() - file.start_pos.to_usize();
 
         file.src[start..end].to_string()
     }
@@ -179,7 +179,7 @@ mod tests {
         );
 
         let str = mgr.lookup_source(
-            Interval::new(Pos::from_usize(3), Pos::from_usize(7))
+            Pos::from_usize(3)..Pos::from_usize(7)
         );
         assert_eq!(str, "defg");
     }
