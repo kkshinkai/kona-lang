@@ -5,20 +5,6 @@ version = 3
 [[package]]
 name = "kona"
 version = "0.1.0"
-dependencies = [
- "kona_source",
-]
-
-[[package]]
-name = "kona_ast"
-version = "0.1.0"
-
-[[package]]
-name = "kona_diagnostic"
-version = "0.1.0"
-dependencies = [
- "kona_source",
-]
 
 [[package]]
 name = "kona_lex"
@@ -26,14 +12,6 @@ version = "0.1.0"
 dependencies = [
  "lazy_static",
 ]
-
-[[package]]
-name = "kona_parse"
-version = "0.1.0"
-
-[[package]]
-name = "kona_session"
-version = "0.1.0"
 
 [[package]]
 name = "kona_source"

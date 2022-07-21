@@ -4,8 +4,4 @@ members = [
     "compiler/kona",
     "compiler/kona_source",
     "compiler/kona_lex",
-    "compiler/kona_parse",
-    "compiler/kona_ast",
-    "compiler/kona_diagnostic",
-    "compiler/kona_session",
 ]
