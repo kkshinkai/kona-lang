@@ -12,11 +12,13 @@ pub struct Expr {
 pub enum ExprKind {
     // Zero-arity tuple, remove this when we have tuples.
     Unit,
+    Lit(/* Lit */),
+    Lambda(Vec<Ident>, Box<Expr>),
+
     Call(Vec<Box<Expr>>, Box<Expr>),
     InfixCall(Ident, Box<Expr>, Box<Expr>),
-    Lit(/* Lit */),
+
     Let(Ident, Box<Expr>, Box<Expr>),
-    Lambda(Vec<Ident>, Box<Expr>),
     If(Box<Expr>, Box<Expr>, Box<Expr>),
     Block(Vec<Expr>),
 }
