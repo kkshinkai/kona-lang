@@ -2,8 +2,13 @@
 
 members = [
     "compiler/kona",
+
+    # Basic passes:
     "compiler/kona_source",
     "compiler/kona_lex",
+    "compiler/kona_ast",
     "compiler/kona_type_ir",
+
+    # Utilities:
     "compiler/kona_intern",
 ]

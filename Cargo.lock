@@ -7,6 +7,14 @@ name = "kona"
 version = "0.1.0"
 
 [[package]]
+name = "kona_ast"
+version = "0.1.0"
+dependencies = [
+ "kona_intern",
+ "kona_source",
+]
+
+[[package]]
 name = "kona_intern"
 version = "0.1.0"
 dependencies = [
