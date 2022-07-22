@@ -2,3 +2,7 @@
 name = "kona_type_ir"
 version = "0.1.0"
 edition = "2021"
+
+[dependencies]
+kona_source = { path = "../kona_source" }
+kona_ast = { path = "../kona_ast" }

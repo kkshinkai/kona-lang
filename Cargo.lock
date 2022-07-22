@@ -39,6 +39,10 @@ dependencies = [
 [[package]]
 name = "kona_type_ir"
 version = "0.1.0"
+dependencies = [
+ "kona_ast",
+ "kona_source",
+]
 
 [[package]]
 name = "lazy_static"
