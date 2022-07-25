@@ -15,7 +15,7 @@ pub enum ExprKind<'tir> {
     Lit(/* Lit */),
     Lambda(Vec<Ident>, &'tir Expr<'tir>),
 
-    Call(&'tir [Expr<'tir>], &'tir Expr<'tir>),
+    Call(&'tir Expr<'tir>, &'tir Expr<'tir>),
     InfixCall(Ident, &'tir Expr<'tir>, &'tir Expr<'tir>),
 
     Let(Ident, &'tir Expr<'tir>, &'tir Expr<'tir>),
