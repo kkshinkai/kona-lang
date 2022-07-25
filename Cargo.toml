@@ -11,4 +11,5 @@ members = [
 
     # Utilities:
     "compiler/kona_intern",
+    "compiler/kona_memory",
 ]
