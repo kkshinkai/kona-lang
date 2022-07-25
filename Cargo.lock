@@ -15,6 +15,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "kona_eval"
+version = "0.1.0"
+
+[[package]]
 name = "kona_lex"
 version = "0.1.0"
 dependencies = [
