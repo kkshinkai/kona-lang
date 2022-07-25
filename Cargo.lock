@@ -10,15 +10,8 @@ version = "0.1.0"
 name = "kona_ast"
 version = "0.1.0"
 dependencies = [
- "kona_intern",
+ "kona_memory",
  "kona_source",
-]
-
-[[package]]
-name = "kona_intern"
-version = "0.1.0"
-dependencies = [
- "lazy_static",
 ]
 
 [[package]]
@@ -31,6 +24,9 @@ dependencies = [
 [[package]]
 name = "kona_memory"
 version = "0.1.0"
+dependencies = [
+ "lazy_static",
+]
 
 [[package]]
 name = "kona_source"

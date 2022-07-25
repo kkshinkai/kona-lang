@@ -10,6 +10,5 @@ members = [
     "compiler/kona_type_ir",
 
     # Utilities:
-    "compiler/kona_intern",
     "compiler/kona_memory",
 ]

@@ -3,7 +3,7 @@
 //
 // $ cargo run --package kona_intern --example symbol
 
-use kona_intern::symbol::Symbol;
+use kona_memory::intern::symbol::Symbol;
 
 fn main() {
     let alpha: &str = "alpha";
@@ -16,4 +16,6 @@ fn main() {
     println!("\"alpha\" = {:?}", alpha_sym);
     println!("\"beta\" = {:?}", beta_sym);
     println!("\"gamma\" = {:?}", Symbol::intern(gamma));
+
+    assert_eq!(alpha_sym, Symbol::intern("alpha"));
 }
