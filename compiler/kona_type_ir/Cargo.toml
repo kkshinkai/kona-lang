@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 kona_source = { path = "../kona_source" }
 kona_ast = { path = "../kona_ast" }
+kona_memory = { path = "../kona_memory" }
