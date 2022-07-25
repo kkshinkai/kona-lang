@@ -4,21 +4,21 @@
 use kona_ast::ident::Ident;
 use kona_source::span::Span;
 
-pub struct Expr {
-    pub kind: ExprKind,
+pub struct Expr<'tir> {
+    pub kind: ExprKind<'tir>,
     pub span: Span,
 }
 
-pub enum ExprKind {
+pub enum ExprKind<'tir> {
     // Zero-arity tuple, remove this when we have tuples.
     Unit,
     Lit(/* Lit */),
-    Lambda(Vec<Ident>, Box<Expr>),
+    Lambda(Vec<Ident>, &'tir Expr<'tir>),
 
-    Call(Vec<Box<Expr>>, Box<Expr>),
-    InfixCall(Ident, Box<Expr>, Box<Expr>),
+    Call(&'tir [Expr<'tir>], &'tir Expr<'tir>),
+    InfixCall(Ident, &'tir Expr<'tir>, &'tir Expr<'tir>),
 
-    Let(Ident, Box<Expr>, Box<Expr>),
-    If(Box<Expr>, Box<Expr>, Box<Expr>),
-    Block(Vec<Expr>),
+    Let(Ident, &'tir Expr<'tir>, &'tir Expr<'tir>),
+    If(&'tir Expr<'tir>, &'tir Expr<'tir>, &'tir Expr<'tir>),
+    Block(&'tir Expr<'tir>),
 }
