@@ -1,7 +1,7 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
-use kona_ast::ident::Ident;
+use kona_ast::token::ident::Ident;
 use kona_source::span::Span;
 
 pub struct Expr<'tir> {
