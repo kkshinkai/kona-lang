@@ -2,5 +2,5 @@
 // root for license information.
 
 pub struct InferContext {
-    
+
 }
