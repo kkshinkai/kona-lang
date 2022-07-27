@@ -86,19 +86,6 @@ impl SourceMap {
         file
     }
 
-    /// Adds a REPL source with the given source string.
-    pub fn load_repl(&mut self, src: String) -> Rc<SourceFile> {
-        let start_pos = Pos::from_usize(self.allocate_pos_space(src.len()));
-        let file = Rc::new(SourceFile::new(
-            // TODO: Maybe use a temporary file?
-            FilePath::Repl(PathBuf::new()),
-            Rc::new(src),
-            start_pos,
-        ));
-        self.files.push(file.clone());
-        file
-    }
-
     pub fn lookup_pos_info(&self, pos: Pos) -> PosInfo {
         let sf = self.lookup_file(pos);
         let (line, col, col_display) = sf.lookup_line_col_and_col_display(pos);

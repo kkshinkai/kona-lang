@@ -40,7 +40,6 @@ impl fmt::Debug for PosInfo {
         // TODO: This may be wrong, test it later.
         let file_name = match self.file.path() {
             FilePath::File(path) => format!("file:{path:?}"),
-            FilePath::Repl(path) => format!("repl:{path:?}"),
             FilePath::Virtual(name) => name.clone(),
         };
 

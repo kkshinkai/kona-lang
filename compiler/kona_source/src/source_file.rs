@@ -1,12 +1,12 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
-use std::{path::PathBuf, rc::Rc, ops::Range};
+use std::{path::{PathBuf, Component, Prefix, Path}, rc::Rc, ops::Range, fmt};
 
 use crate::{pos::Pos, source_analyzer};
 
 /// Represents a source file.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq)]
 pub struct SourceFile {
     /// The path to the source file.
     path: FilePath,
@@ -45,9 +45,18 @@ pub struct SourceFile {
     non_narrow_chars: Vec<NonNarrowChar>,
 }
 
-impl SourceFile {
-    pub fn path(&self) -> &FilePath {
-        &self.path
+impl fmt::Debug for SourceFile {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // TODO
+        f.debug_struct("SourceFile")
+            .field("path", &self.path)
+            .field("src", &self.src)
+            .field("start_pos", &self.start_pos)
+            .field("end_pos", &self.end_pos)
+            .field("lines", &self.lines)
+            .field("multi_byte_chars", &self.multi_byte_chars)
+            .field("non_narrow_chars", &self.non_narrow_chars)
+            .finish()
     }
 }
 
@@ -61,6 +70,10 @@ impl SourceFile {
             src, path, start_pos, end_pos, lines,
             multi_byte_chars, non_narrow_chars,
         }
+    }
+
+    pub fn path(&self) -> &FilePath {
+        &self.path
     }
 
     /// Finds the line containing the given position.
@@ -153,19 +166,72 @@ impl SourceFile {
 ///
 /// The file may be virtual, or it may not exist. We don't check these when
 /// creating a new [`FilePath`].
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub enum FilePath {
     /// The path to a local file.
     File(PathBuf),
 
-    /// Temporary file that holds the code in REPL.
-    ///
-    /// Kona does not have an interpretation mode, the REPL input will be placed
-    /// in a temporary file and compiled like a common source file.
-    Repl(PathBuf),
-
     /// A dummy file with given name, mostly for testing.
     Virtual(String),
+}
+
+impl FilePath {
+    /// Returns a path string that the user can use directly in most cases.
+    ///
+    /// Here are some example usages:
+    ///
+    /// - Used as a command line parameter to other programs in terminal;
+    /// - Can be linkified in some terminals, e.g. VS Code built-in terminal;
+    /// - Can be highlighted correctly in some text or Markdown editors;
+    ///
+    pub fn linkify(&self) -> String {
+        match self {
+            FilePath::File(path) => {
+                #[cfg(not(windows))] {
+                    path.to_string_lossy().to_string()
+                }
+
+                // Rust `std::fs::canonicalize` returns Windows NT UNC paths on
+                // Windows (e.g. `\\?\C:\example.txt`), which are rarely
+                // supported by Windows programs, even Microsoft's own. Just
+                // remove the verbatim prefix.
+                //
+                // This path is already canonicalized, so we don't need to
+                // verify it again.
+                //
+                // TBD: Maybe we should use `std::path::absolute` (unstable)
+                // instead of `std::fs::canonicalize`?
+                #[cfg(windows)] {
+                    if let Some(Component::Prefix(p)) = path.components().next() {
+                        if matches!(p.kind(), Prefix::VerbatimDisk(..)) {
+                            // Is the string always longer than 4?
+                            return path.to_string_lossy()[4..].to_string();
+                        }
+                    }
+                    path.to_string_lossy().to_string()
+                }
+            }
+            FilePath::Virtual(name) => name.clone(),
+        }
+    }
+
+    #[inline]
+    pub fn linkify_with_quotes(&self) -> String {
+        format!("\"{}\"", self.linkify())
+    }
+}
+
+#[test]
+#[cfg(windows)]
+fn linkify_unc_test() {
+    let path = FilePath::File(PathBuf::from(r"\\?\C:\example.txt"));
+    assert_eq!(path.linkify(), r"C:\example.txt");
+}
+
+impl fmt::Debug for FilePath {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.linkify_with_quotes())
+    }
 }
 
 /// Represents a multi-byte UTF-8 unicode scalar in the source code.

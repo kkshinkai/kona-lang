@@ -31,5 +31,5 @@ fn lex(file: &str) {
     let sf = sm.load_file(PathBuf::from(file))
         .expect(&format!("error: failed to load file '{}'", file));
 
-    println!("{:?}", sf);
+    println!("{:#?}", sf);
 }
