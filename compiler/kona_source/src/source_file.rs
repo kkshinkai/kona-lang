@@ -47,15 +47,20 @@ pub struct SourceFile {
 
 impl fmt::Debug for SourceFile {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // TODO
+        let src_string = if self.src.len() > 80 {
+            format!("{} ... {}",
+                &self.src[..30], &self.src[self.src.len() - 30..])
+        } else {
+            self.src.to_string()
+        };
+
+        let pos = &format!("{}..{}",
+            self.start_pos.to_usize(), self.end_pos.to_usize());
+
         f.debug_struct("SourceFile")
             .field("path", &self.path)
-            .field("src", &self.src)
-            .field("start_pos", &self.start_pos)
-            .field("end_pos", &self.end_pos)
-            .field("lines", &self.lines)
-            .field("multi_byte_chars", &self.multi_byte_chars)
-            .field("non_narrow_chars", &self.non_narrow_chars)
+            .field("src", &src_string)
+            .field("pos", pos)
             .finish()
     }
 }
