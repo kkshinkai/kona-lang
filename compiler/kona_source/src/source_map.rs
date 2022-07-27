@@ -51,7 +51,7 @@ impl SourceMap {
         &mut self, path: PathBuf,
     ) -> io::Result<Rc<SourceFile>> {
         // Path must be absolute to uniquely identify the source file.
-        let file_path = FilePath::File(fs::canonicalize(&path)?);
+        let file_path = FilePath::LocalFile(fs::canonicalize(&path)?);
         if let Some(sf) = self.files_map.get(&file_path) {
             return Ok(sf.clone());
         }

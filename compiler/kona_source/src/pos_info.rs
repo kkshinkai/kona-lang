@@ -4,7 +4,7 @@
 use std::fmt;
 use std::rc::Rc;
 
-use crate::source_file::{SourceFile, FilePath};
+use crate::source_file::SourceFile;
 
 /// Represents a set of human-readable position information, including the line,
 /// column, file name, some other metadata of the source file.
@@ -38,13 +38,8 @@ impl PosInfo {
 impl fmt::Debug for PosInfo {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         // TODO: This may be wrong, test it later.
-        let file_name = match self.file.path() {
-            FilePath::File(path) => format!("file:{path:?}"),
-            FilePath::Virtual(name) => name.clone(),
-        };
-
         f.debug_struct("PosInfo")
-            .field("file", &file_name)
+            .field("file", &self.file)
             .field("line", &self.line)
             .field("column", &self.col)
             .finish()

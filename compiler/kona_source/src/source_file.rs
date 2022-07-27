@@ -72,8 +72,15 @@ impl SourceFile {
         }
     }
 
-    pub fn path(&self) -> &FilePath {
-        &self.path
+    pub fn path(&self) -> Option<&Path> {
+        match &self.path {
+            FilePath::LocalFile(path) => Some(path.as_path()),
+            FilePath::Virtual(_) => None,
+        }
+    }
+
+    pub fn is_virtual(&self) -> bool {
+        matches!(&self.path, FilePath::Virtual(_))
     }
 
     /// Finds the line containing the given position.
@@ -161,15 +168,22 @@ impl SourceFile {
     }
 }
 
-
-/// Represents a path to a source file.
+/// A Kona source file path.
 ///
-/// The file may be virtual, or it may not exist. We don't check these when
-/// creating a new [`FilePath`].
+/// This is a component of [`SourceFile`], the file must exist if it is not
+/// virtual. This path should be canonical and absolute.
+///
+/// The [`FilePath`] should only be created when a new [`SourceFile`] is added
+/// to the [`SourceMap`]. It verifies that the file exists, and reads the source
+/// code.
+///
+/// Once a file has been read, Kona no longer cares whether it exists or not.
+/// Don't read the file again with this path.
 #[derive(Clone, PartialEq, Eq, Hash)]
-pub enum FilePath {
-    /// The path to a local file.
-    File(PathBuf),
+pub(crate) enum FilePath {
+    /// The canonical, unique path to a local file. The path must be
+    /// canonicalized by [`std::fs::canonicalize`].
+    LocalFile(PathBuf),
 
     /// A dummy file with given name, mostly for testing.
     Virtual(String),
@@ -186,7 +200,7 @@ impl FilePath {
     ///
     pub fn linkify(&self) -> String {
         match self {
-            FilePath::File(path) => {
+            FilePath::LocalFile(path) => {
                 #[cfg(not(windows))] {
                     path.to_string_lossy().to_string()
                 }
@@ -224,7 +238,7 @@ impl FilePath {
 #[test]
 #[cfg(windows)]
 fn linkify_unc_test() {
-    let path = FilePath::File(PathBuf::from(r"\\?\C:\example.txt"));
+    let path = FilePath::LocalFile(PathBuf::from(r"\\?\C:\example.txt"));
     assert_eq!(path.linkify(), r"C:\example.txt");
 }
 
