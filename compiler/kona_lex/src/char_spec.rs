@@ -1,36 +1,49 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
-/// Returns true if the character is a inline space, `' '`, `'\t'`, `'\0'`,
-/// `'\u{000B}'` or `'\u{000C}'`.
+/// Returns true if the character is a inline space, space (U+0020) or
+/// horizontal tab (U+0009).
 pub fn is_inline_space(c: char) -> bool {
-    matches!(c, ' '/* U+0020 space */
-              | '\t'/* U+0009 horizontal tab */
-              | '\0'/* U+0000 NULL */
-              | '\u{000B}'/* U+000B vertical tab */
-              | '\u{000C}'/* U+000C form feed */)
+    matches!(c, '\x20'/* U+0020 space */
+              | '\x09'/* U+0009 horizontal tab */)
 }
 
-/// Returns true if the character is a line break, `'\n'` or `'\r'`.
-pub fn is_linebreak(c: char) -> bool {
-    matches!(c, '\n'/* U+000A line feed */
-              | '\r'/* U+000D carriage return */)
+/// Returns true if the character is a whitespace, space (U+0020), line feed
+/// (U+000A), carriage return (U+000D), horizontal tab (U+0009), vertical tab
+/// (U+000B), form feed (U+000C) and null (U+0000).
+pub fn is_whitespace(c: char) -> bool {
+    matches!(c, '\x20'/* U+0020 space */
+              | '\x0A'/* U+000A line feed */
+              | '\x0D'/* U+000D carriage return */
+              | '\x09'/* U+0009 horizontal tab */
+              | '\x0B'/* U+000B vertical tab */
+              | '\x0C'/* U+000C form feed */
+              | '\x00'/* U+0000 null */)
 }
 
-/// Returns true if the character can be the head of an alphanumeric identifier.
-pub fn is_alpha_ident_head(c: char) -> bool {
+/// Returns true if the character is a line break, line feed (U+000A) or
+/// carriage return (U+000D).
+pub fn is_line_break(c: char) -> bool {
+    // Don use the name `is_eol` here because 'end of line' is CR, LF or CRLF,
+    // not a single character.
+    matches!(c, '\x0A'/* U+000A line feed */
+              | '\x0D'/* U+000D carriage return */)
+}
+
+/// Returns true if the character can be the head of an identifier.
+pub fn is_ident_head(c: char) -> bool {
     matches!(c, 'a'..='z' | 'A'..='Z' | '_')
 }
 
-/// Returns true if the character can be a part of an alphanumeric identifier.
-pub fn is_alpha_ident_part(c: char) -> bool {
+/// Returns true if the character can be a part of an identifier.
+pub fn is_ident_part(c: char) -> bool {
     matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_')
 }
 
-/// Returns true if the character can be the head of a symbolic identifier,
-/// including `'!'`, `'%'`, `'&'`, `'$'`, `'+'`, `'-'`, `':'`, `'<'`, `'='`,
-/// `'>'`, `'?'`, `'/'`, `'~'`, `'^'`, `'|'`, and `'*'`.
-pub fn is_sym_ident(c: char) -> bool {
+/// Returns true if the character can be a part of an operator, including
+/// `'!'`, `'%'`, `'&'`, `'$'`, `'+'`, `'-'`, `':'`, `'<'`, `'='`, `'>'`, `'?'`,
+/// `'/'`, `'~'`, `'^'`, `'|'`, and `'*'`.
+pub fn is_operator_part(c: char) -> bool {
     matches!(c, '!' | '%' | '&' | '$' | '+' | '-' | ':' | '<'
               | '=' | '>' | '?' | '/' | '~' | '^' | '|' | '*')
 }

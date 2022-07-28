@@ -14,7 +14,7 @@ fn print_token_list(source: &str) {
     println!("TokenList [");
     for token in tokens {
         let text = &source[pos..pos + token.len];
-        println!("    {} {:?},", token.kind, text);
+        println!("    {:?} {:?},", token.kind, text);
         pos += token.len;
     }
     println!("]");

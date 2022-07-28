@@ -5,8 +5,8 @@ use std::collections::HashMap;
 
 use crate::source_iter::SourceIter;
 use crate::char_spec::*;
-use crate::token::{IdentKind, LitKind, TriviaKind};
-use crate::token::{Token, TokenKind::{self, *}};
+use crate::token::{LitKind, TriviaKind, KeywordKind};
+use crate::token::{Token, TokenKind};
 
 /// Creates an iterator that produces tokens from the input string.
 pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
@@ -23,16 +23,22 @@ pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
 
 lazy_static! {
     static ref ALPHA_KEYWORD_TABLE: HashMap<&'static str, TokenKind> = [
-        ("else", Else), ("end", End), ("fn", Fn), ("if", If), ("in", In),
-        ("let", Let), ("op", Op), ("then", Then), ("val", Val),
-        ("true", Lit(LitKind::Bool)), ("false", Lit(LitKind::Bool)),
+        ("else", TokenKind::Keyword(KeywordKind::Else)),
+        ("fn", TokenKind::Keyword(KeywordKind::Fn)),
+        ("if", TokenKind::Keyword(KeywordKind::If)),
+        ("in", TokenKind::Keyword(KeywordKind::In)),
+        ("infix", TokenKind::Keyword(KeywordKind::Infix)),
+        ("let", TokenKind::Keyword(KeywordKind::Let)),
+        ("then", TokenKind::Keyword(KeywordKind::Then)),
+        ("true", TokenKind::Lit(LitKind::Bool)),
+        ("false", TokenKind::Lit(LitKind::Bool)),
     ].into_iter().collect::<HashMap<_, _>>();
 
     static ref MAX_ALPHA_KEYWORD_LEN: usize =
         ALPHA_KEYWORD_TABLE.keys().map(|s| s.len()).max().unwrap();
 
     static ref SYMBOL_KEYWORD_TABLE: HashMap<&'static str, TokenKind> = [
-        ("=>", DArrow), ("=", Eq),
+        ("=>", TokenKind::DArrow), ("=", TokenKind::Eq),
     ].into_iter().collect::<HashMap<_, _>>();
 
     static ref MAX_SYMBOL_KEYWORD_LEN: usize =
@@ -48,14 +54,14 @@ impl SourceIter<'_> {
             // Line comment or symbolic identifier start with '--'.
             '-' if self.peek_snd() == '-' => {
                 let next = self.peek_trd();
-                if is_inline_space(next) || is_linebreak(next) {
+                if is_inline_space(next) || is_line_break(next) {
                     self.lex_line_comment()
                 } else {
-                    self.lex_sym_ident()
+                    self.lex_operator()
                 }
             }
 
-            c if is_sym_ident(c) => self.lex_sym_ident(),
+            c if is_operator_part(c) => self.lex_operator(),
 
             // Whitespace sequence.
             c if is_inline_space(c) => self.lex_inline_spaces(),
@@ -64,10 +70,10 @@ impl SourceIter<'_> {
             '\n' | '\r' => self.lex_end_of_line(),
 
             // Alphanumeric identifier or keyword.
-            c if is_alpha_ident_head(c) => self.lex_alpha_ident(),
+            c if is_ident_head(c) => self.lex_ident(),
 
             // Symbolic identifier or keyword.
-            c if is_sym_ident(c) => self.lex_sym_ident(),
+            c if is_operator_part(c) => self.lex_operator(),
 
             // Integer literal and float literal.
             '0'..='9' => self.lex_number(),
@@ -75,11 +81,11 @@ impl SourceIter<'_> {
             // String literal.
             '"' => self.lex_string(),
 
-            ';' => { self.eat(); Semi }
-            '(' => { self.eat(); LParen }
-            ')' => { self.eat(); RParen }
+            ';' => { self.eat(); TokenKind::Semi }
+            '(' => { self.eat(); TokenKind::LParen }
+            ')' => { self.eat(); TokenKind::RParen }
 
-            _ => { self.eat(); Invalid }
+            _ => { self.eat(); TokenKind::Invalid }
         };
         Token::new(kind, self.consumed_len())
     }
@@ -87,7 +93,7 @@ impl SourceIter<'_> {
     fn lex_line_comment(&mut self) -> TokenKind {
         debug_assert!(self.eat() == '-' && self.eat() == '-');
         self.eat_while(|c| c != '\n');
-        Trivia(TriviaKind::SingleLineComment)
+        TokenKind::Trivia(TriviaKind::SingleLineComment)
     }
 
     fn lex_block_comment(&mut self) -> TokenKind {
@@ -104,7 +110,7 @@ impl SourceIter<'_> {
                     self.eat();
                     depth -= 1;
                     if depth == 0 {
-                        return Trivia(TriviaKind::MultiLineComment {
+                        return TokenKind::Trivia(TriviaKind::MultiLineComment {
                             terminated: true,
                         });
                     }
@@ -113,52 +119,52 @@ impl SourceIter<'_> {
             }
         }
 
-        Trivia(TriviaKind::MultiLineComment { terminated: false })
+        TokenKind::Trivia(TriviaKind::MultiLineComment { terminated: false })
     }
 
     fn lex_inline_spaces(&mut self) -> TokenKind {
         debug_assert!(is_inline_space(self.eat()));
 
         self.eat_while(is_inline_space);
-        Trivia(TriviaKind::Whitespace)
+        TokenKind::Trivia(TriviaKind::Whitespace)
     }
 
     fn lex_end_of_line(&mut self) -> TokenKind {
-        debug_assert!(is_linebreak(self.peek_fst()));
+        debug_assert!(is_line_break(self.peek_fst()));
 
         if self.eat() == '\r' && self.peek_fst() == '\n' {
             self.eat(); // Consume '\n' in CRLF.
         }
 
-        Trivia(TriviaKind::Eol)
+        TokenKind::Trivia(TriviaKind::Eol)
     }
 
-    fn lex_alpha_ident(&mut self) -> TokenKind {
-        debug_assert!(is_alpha_ident_head(self.peek_fst()));
+    fn lex_ident(&mut self) -> TokenKind {
+        debug_assert!(is_ident_head(self.peek_fst()));
 
         let mut ident = String::new();
-        while is_alpha_ident_part(self.peek_fst()) {
+        while is_ident_part(self.peek_fst()) {
             ident.push(self.eat());
         }
 
         ALPHA_KEYWORD_TABLE
             .get(ident.as_str())
             .cloned()
-            .unwrap_or(Ident(IdentKind::Alphanumeric))
+            .unwrap_or(TokenKind::Ident)
     }
 
-    fn lex_sym_ident(&mut self) -> TokenKind {
-        debug_assert!(is_sym_ident(self.peek_fst()));
+    fn lex_operator(&mut self) -> TokenKind {
+        debug_assert!(is_operator_part(self.peek_fst()));
 
         let mut ident = String::new();
-        while is_sym_ident(self.peek_fst()) {
+        while is_operator_part(self.peek_fst()) {
             ident.push(self.eat());
         }
 
         SYMBOL_KEYWORD_TABLE
             .get(ident.as_str())
             .cloned()
-            .unwrap_or(Ident(IdentKind::Symbolic))
+            .unwrap_or(TokenKind::Op)
     }
 
     fn lex_number(&mut self) -> TokenKind {
@@ -169,9 +175,9 @@ impl SourceIter<'_> {
         if self.peek_fst() == '.' && is_digit(self.peek_snd()) {
             self.eat(); // Eat '.'.
             self.eat_while(is_digit);
-            Lit(LitKind::Float)
+            TokenKind::Lit(LitKind::Float)
         } else {
-            Lit(LitKind::Int)
+            TokenKind::Lit(LitKind::Int)
         }
     }
 
@@ -180,14 +186,18 @@ impl SourceIter<'_> {
 
         while let Some(c) = self.next() {
             match c {
-                '"' => return Lit(LitKind::String { terminated: true }),
+                '"' => {
+                    return TokenKind::Lit(LitKind::String {
+                        terminated: true
+                    })
+                },
                 '\\' if self.peek_fst() == '\\' && self.peek_fst() == '"' => {
                     self.eat();
-                }
+                },
                 _ => (),
             }
         }
 
-        Lit(LitKind::String { terminated: false })
+        TokenKind::Lit(LitKind::String { terminated: false })
     }
 }
