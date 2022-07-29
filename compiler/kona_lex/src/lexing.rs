@@ -67,7 +67,7 @@ impl SourceIter<'_> {
             c if is_inline_space(c) => self.lex_inline_spaces(),
 
             // End of line.
-            '\n' | '\r' => self.lex_end_of_line(),
+            c if is_line_break(c) => self.lex_end_of_line(),
 
             // Alphanumeric identifier or keyword.
             c if is_ident_head(c) => self.lex_ident(),
@@ -191,7 +191,8 @@ impl SourceIter<'_> {
                         terminated: true
                     })
                 },
-                '\\' if self.peek_fst() == '\\' && self.peek_fst() == '"' => {
+                '\\' if matches!(self.peek_fst(), '0' | '\\' | 't'
+                                                | 'n' | 'r' | '"') => {
                     self.eat();
                 },
                 _ => (),
