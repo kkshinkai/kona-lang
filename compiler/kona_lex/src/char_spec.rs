@@ -11,7 +11,9 @@ pub fn is_inline_space(c: char) -> bool {
 /// Returns true if the character is a whitespace, space (U+0020), line feed
 /// (U+000A), carriage return (U+000D), horizontal tab (U+0009), vertical tab
 /// (U+000B), form feed (U+000C) and null (U+0000).
+#[allow(dead_code)]
 pub fn is_whitespace(c: char) -> bool {
+    // FIXME: Reconsider the definition of whitespace.
     matches!(c, '\x20'/* U+0020 space */
               | '\x0A'/* U+000A line feed */
               | '\x0D'/* U+000D carriage return */
@@ -40,12 +42,12 @@ pub fn is_ident_part(c: char) -> bool {
     matches!(c, 'a'..='z' | 'A'..='Z' | '0'..='9' | '_')
 }
 
-/// Returns true if the character can be a part of an operator, including
-/// `'!'`, `'%'`, `'&'`, `'$'`, `'+'`, `'-'`, `':'`, `'<'`, `'='`, `'>'`, `'?'`,
-/// `'/'`, `'~'`, `'^'`, `'|'`, and `'*'`.
+/// Returns true if the character can be a part of an operator, including `!`,
+/// `$`, `%`, `&`, `*`, `+`, `-`, `/`, `:`, `<`, `=`, `>`, `?`, `^`, `|`,
+/// and `~`.
 pub fn is_operator_part(c: char) -> bool {
-    matches!(c, '!' | '%' | '&' | '$' | '+' | '-' | ':' | '<'
-              | '=' | '>' | '?' | '/' | '~' | '^' | '|' | '*')
+    matches!(c, '!' | '$' | '%' | '&' | '*' | '+' | '-' | '/'
+              | ':' | '<' | '=' | '>' | '?' | '^' | '|' | '~')
 }
 
 /// Returns true if the character is a decimal digit.

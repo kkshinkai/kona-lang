@@ -66,6 +66,8 @@ impl<'s> SourceIter<'s> {
         iter.next().unwrap_or(EOF_CHAR)
     }
 
+    #[deprecated]
+    #[allow(dead_code)]
     pub(crate) fn peek_trd(&self) -> char {
         let mut iter = self.chars.clone();
         iter.next();
