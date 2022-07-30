@@ -3,7 +3,7 @@
 
 use crate::pos::Pos;
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Span {
     pub start: Pos,
     pub end: Pos,
