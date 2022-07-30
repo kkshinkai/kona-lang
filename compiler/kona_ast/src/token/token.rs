@@ -17,6 +17,15 @@ pub enum TokenKind {
     Semi,
     Eq,
     DArrow,
+
+    Else,
+    Fn,
+    If,
+    In,
+    Infix,
+    Let,
+    Then,
+
     Ident(Symbol),
     Op(Symbol),
     Lit(LitKind),
