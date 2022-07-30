@@ -5,7 +5,7 @@
 
 use std::path::PathBuf;
 
-use kona_lex::lexing::tokenize;
+use kona_lex::tokenize;
 
 fn print_token_list(source: &str) {
     let tokens = tokenize(source);

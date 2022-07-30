@@ -48,16 +48,12 @@ lazy_static! {
 impl SourceIter<'_> {
     fn lex_token(&mut self) -> Token {
         let kind = match self.peek_fst() {
-            // Block comment or symbolic identifier start with '/'.
-            '/' if self.peek_snd() == '-' => self.lex_block_comment(),
-
-            // Line comment or symbolic identifier start with '--'.
-            '-' if self.peek_snd() == '-' => {
-                let next = self.peek_trd();
-                if is_inline_space(next) || is_line_break(next) {
-                    self.lex_line_comment()
-                } else {
-                    self.lex_operator()
+            // Comment or operator start with '/'.
+            '/' => {
+                match self.peek_snd() {
+                    '-' => self.lex_block_comment(), // Multi-line comment.
+                    '/' => self.lex_line_comment(),  // Single-line comment.
+                    _ => self.lex_operator(),
                 }
             }
 
@@ -91,7 +87,7 @@ impl SourceIter<'_> {
     }
 
     fn lex_line_comment(&mut self) -> TokenKind {
-        debug_assert!(self.eat() == '-' && self.eat() == '-');
+        debug_assert!(self.eat() == '/' && self.eat() == '/');
         self.eat_while(|c| c != '\n');
         TokenKind::Trivia(TriviaKind::SingleLineComment)
     }
