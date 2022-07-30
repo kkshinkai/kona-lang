@@ -3,46 +3,46 @@
 
 use std::collections::HashMap;
 
+use kona_source::pos::Pos;
+
 use crate::source_iter::SourceIter;
 use crate::char_spec::*;
-use crate::token::{LitKind, TriviaKind, KeywordKind};
-use crate::token::{Token, TokenKind};
+use crate::token::{TokenKind, LitKind, Token, TriviaKind};
 
 /// Creates an iterator that produces tokens from the input string.
-pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
-    let mut iter = SourceIter::new(input);
+pub fn tokenize(input: &str, start_pos: Pos) -> impl Iterator<Item = Token> + '_ {
+    let mut iter = SourceIter::new(input, start_pos);
     std::iter::from_fn(move || {
         if iter.is_eof() {
             None
         } else {
-            iter.reset_consumed_len();
             Some(iter.lex_token())
         }
     })
 }
 
 lazy_static! {
-    static ref ALPHA_KEYWORD_TABLE: HashMap<&'static str, TokenKind> = [
-        ("else", TokenKind::Keyword(KeywordKind::Else)),
-        ("fn", TokenKind::Keyword(KeywordKind::Fn)),
-        ("if", TokenKind::Keyword(KeywordKind::If)),
-        ("in", TokenKind::Keyword(KeywordKind::In)),
-        ("infix", TokenKind::Keyword(KeywordKind::Infix)),
-        ("let", TokenKind::Keyword(KeywordKind::Let)),
-        ("then", TokenKind::Keyword(KeywordKind::Then)),
+    static ref KEYWORD_TABLE: HashMap<&'static str, TokenKind> = [
+        ("else", TokenKind::Else),
+        ("fn", TokenKind::Fn),
+        ("if", TokenKind::If),
+        ("in", TokenKind::In),
+        ("infix", TokenKind::Infix),
+        ("let", TokenKind::Let),
+        ("then", TokenKind::Then),
         ("true", TokenKind::Lit(LitKind::Bool)),
         ("false", TokenKind::Lit(LitKind::Bool)),
     ].into_iter().collect::<HashMap<_, _>>();
 
-    static ref MAX_ALPHA_KEYWORD_LEN: usize =
-        ALPHA_KEYWORD_TABLE.keys().map(|s| s.len()).max().unwrap();
+    static ref MAX_KEYWORD_LEN: usize =
+        KEYWORD_TABLE.keys().map(|s| s.len()).max().unwrap();
 
-    static ref SYMBOL_KEYWORD_TABLE: HashMap<&'static str, TokenKind> = [
+    static ref OP_LIKE_PUNCT_TABLE: HashMap<&'static str, TokenKind> = [
         ("=>", TokenKind::DArrow), ("=", TokenKind::Eq),
     ].into_iter().collect::<HashMap<_, _>>();
 
-    static ref MAX_SYMBOL_KEYWORD_LEN: usize =
-        SYMBOL_KEYWORD_TABLE.keys().map(|s| s.len()).max().unwrap();
+    static ref OP_LIKE_PUNCT_LEN: usize =
+        OP_LIKE_PUNCT_TABLE.keys().map(|s| s.len()).max().unwrap();
 }
 
 impl SourceIter<'_> {
@@ -83,7 +83,7 @@ impl SourceIter<'_> {
 
             _ => { self.eat(); TokenKind::Invalid }
         };
-        Token::new(kind, self.consumed_len())
+        Token::new(kind, self.consume_span())
     }
 
     fn lex_line_comment(&mut self) -> TokenKind {
@@ -106,16 +106,15 @@ impl SourceIter<'_> {
                     self.eat();
                     depth -= 1;
                     if depth == 0 {
-                        return TokenKind::Trivia(TriviaKind::MultiLineComment {
-                            terminated: true,
-                        });
+                        return TokenKind::Trivia(TriviaKind::MultiLineComment);
                     }
                 }
                 _ => (),
             }
         }
 
-        TokenKind::Trivia(TriviaKind::MultiLineComment { terminated: false })
+        // Unterminated multi-line comment.
+        TokenKind::Invalid
     }
 
     fn lex_inline_spaces(&mut self) -> TokenKind {
@@ -143,7 +142,7 @@ impl SourceIter<'_> {
             ident.push(self.eat());
         }
 
-        ALPHA_KEYWORD_TABLE
+        KEYWORD_TABLE
             .get(ident.as_str())
             .cloned()
             .unwrap_or(TokenKind::Ident)
@@ -157,7 +156,7 @@ impl SourceIter<'_> {
             ident.push(self.eat());
         }
 
-        SYMBOL_KEYWORD_TABLE
+        OP_LIKE_PUNCT_TABLE
             .get(ident.as_str())
             .cloned()
             .unwrap_or(TokenKind::Op)
@@ -183,9 +182,7 @@ impl SourceIter<'_> {
         while let Some(c) = self.next() {
             match c {
                 '"' => {
-                    return TokenKind::Lit(LitKind::String {
-                        terminated: true
-                    })
+                    return TokenKind::Lit(LitKind::String)
                 },
                 '\\' if matches!(self.peek_fst(), '0' | '\\' | 't'
                                                 | 'n' | 'r' | '"') => {
@@ -195,6 +192,7 @@ impl SourceIter<'_> {
             }
         }
 
-        TokenKind::Lit(LitKind::String { terminated: false })
+        // Unterminated string literal.
+        TokenKind::Invalid
     }
 }

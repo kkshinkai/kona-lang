@@ -1,38 +1,28 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+use kona_source::span::Span;
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Token {
     pub kind: TokenKind,
-    pub len: usize,
+    pub span: Span,
 }
 
 impl Token {
-    pub fn new(kind: TokenKind, len: usize) -> Token {
-        Token { kind, len }
+    pub fn new(kind: TokenKind, span: Span) -> Token {
+        Token { kind, span }
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TokenKind {
-    Ident,
-    Op,
-    Lit(LitKind),
-    Keyword(KeywordKind),
-
-    DArrow,
-    Eq,
-
-    Semi,
     LParen,
     RParen,
+    Semi,
+    Eq,
+    DArrow,
 
-    Trivia(TriviaKind),
-    Invalid,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum KeywordKind {
     Else,
     Fn,
     If,
@@ -40,21 +30,27 @@ pub enum KeywordKind {
     Infix,
     Let,
     Then,
+
+    Ident,
+    Op,
+    Lit(LitKind),
+
+    Trivia(TriviaKind),
+    Invalid,
 }
 
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum LitKind {
     Int,
     Float,
-    String { terminated: bool },
     Bool,
+    String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TriviaKind {
+    SingleLineComment,
+    MultiLineComment,
     Whitespace,
     Eol,
-    SingleLineComment,
-    MultiLineComment { terminated: bool },
 }

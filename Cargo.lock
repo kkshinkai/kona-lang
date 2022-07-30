@@ -25,6 +25,9 @@ version = "0.1.0"
 name = "kona_lex"
 version = "0.1.0"
 dependencies = [
+ "kona_ast",
+ "kona_memory",
+ "kona_source",
  "lazy_static",
 ]
 

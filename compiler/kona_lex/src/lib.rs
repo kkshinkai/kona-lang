@@ -5,8 +5,5 @@
 
 mod source_iter;
 mod char_spec;
-mod token;
-mod lexing;
-
-pub use lexing::tokenize;
-pub use token::*;
+pub mod token;
+pub mod lexing;

@@ -2,7 +2,7 @@
 // root for license information.
 
 use std::fmt;
-use std::ops::{Add, Sub};
+use std::ops::{Add, Sub, AddAssign, SubAssign};
 
 /// Represents a position in source code (a branch of source files in a source
 /// map).
@@ -77,11 +77,23 @@ impl Add<usize> for Pos {
     }
 }
 
+impl AddAssign<usize> for Pos {
+    fn add_assign(&mut self, offset: usize) {
+        self.index += offset;
+    }
+}
+
 impl Sub<usize> for Pos {
     type Output = Pos;
 
     #[inline(always)]
     fn sub(self, offset: usize) -> Pos {
         Pos::from_usize(self.index - offset)
+    }
+}
+
+impl SubAssign<usize> for Pos {
+    fn sub_assign(&mut self, offset: usize) {
+        self.index -= offset;
     }
 }

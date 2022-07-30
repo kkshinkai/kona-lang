@@ -3,6 +3,8 @@
 
 use std::str::Chars;
 
+use kona_source::{pos::Pos, span::Span};
+
 /// Peekable iterator with position information over a source string.
 ///
 /// This iterator that provides three additional mechanisms on [`str::Chars`]:
@@ -20,6 +22,10 @@ use std::str::Chars;
 /// [`reset_consumed_len`]: crate::source_iter::SourceIter::reset_consumed_len
 /// [`Peekable`]: std::iter::Peekable
 pub(crate) struct SourceIter<'s> {
+    /// Start position of the current token, not the start position of this
+    /// file, this value will be updated every time [`consume_span`] is called.
+    start_pos: Pos,
+
     /// The initial number of bytes left in the iterator.
     ///
     /// This length is the number of bytes, not [`char`]s. You can get the
@@ -32,6 +38,8 @@ pub(crate) struct SourceIter<'s> {
     ///         |     |------remain_len------|  chars.as_str().len()
     ///         |--------initial_len---------|  initial_len
     /// ```
+    ///
+    /// This value should only be accessed by [`consume_span`].
     initial_len: usize,
 
     /// Iterator over source characters.
@@ -49,8 +57,9 @@ impl<'s> Iterator for SourceIter<'s> {
 const EOF_CHAR: char = '\0';
 
 impl<'s> SourceIter<'s> {
-    pub(crate) fn new(source: &'s str) -> SourceIter {
+    pub(crate) fn new(source: &'s str, start_pos: Pos) -> SourceIter {
         SourceIter {
+            start_pos,
             initial_len: source.len(),
             chars: source.chars(),
         }
@@ -66,16 +75,6 @@ impl<'s> SourceIter<'s> {
         iter.next().unwrap_or(EOF_CHAR)
     }
 
-    #[deprecated]
-    #[allow(dead_code)]
-    pub(crate) fn peek_trd(&self) -> char {
-        let mut iter = self.chars.clone();
-        iter.next();
-        iter.next();
-        iter.next().unwrap_or(EOF_CHAR)
-    }
-
-
     pub(crate) fn eat(&mut self) -> char {
         self.chars.next().unwrap_or(EOF_CHAR)
     }
@@ -90,12 +89,20 @@ impl<'s> SourceIter<'s> {
         self.chars.as_str().is_empty()
     }
 
-    pub(crate) fn reset_consumed_len(&mut self) {
-        self.initial_len = self.chars.as_str().len();
-    }
+    /// Get and consume the span of the current token after all characters of
+    /// this token have been eaten.
+    pub (crate) fn consume_span(&mut self) -> Span {
+        let consumed_len = self.initial_len - self.chars.as_str().len();
+        let start_pos = self.start_pos;
 
-    pub(crate) fn consumed_len(&self) -> usize {
-        self.initial_len - self.chars.as_str().len()
+        // Set `initial_len` and `start_pos` to the current position.
+        self.initial_len = self.chars.as_str().len();
+        self.start_pos += consumed_len;
+
+        Span {
+            start: start_pos,
+            end: start_pos + consumed_len,
+        }
     }
 }
 
