@@ -6,7 +6,7 @@ members = [
     # Basic passes:
     "compiler/kona_source",
     "compiler/kona_diagnostic",
-    "compiler/kona_lex",
+    "compiler/kona_parse",
     "compiler/kona_ast",
     "compiler/kona_type_ir",
     "compiler/kona_eval",

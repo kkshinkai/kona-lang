@@ -3,9 +3,10 @@
 
 use std::collections::HashMap;
 use kona_source::pos::Pos;
-use crate::source_iter::SourceIter;
-use crate::char_spec::*;
-use crate::token::{TokenKind, LitKind, Token, TriviaKind};
+
+use super::token::{TokenKind, LitKind, Token, TriviaKind};
+use super::source_iter::SourceIter;
+use super::char_spec::*;
 
 /// Creates an iterator that produces tokens from the input string.
 pub fn tokenize(input: &str, start_pos: Pos) -> impl Iterator<Item = Token> + '_ {

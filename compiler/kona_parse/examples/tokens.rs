@@ -1,11 +1,11 @@
 // Copyright (c) Kk Shinkai. All Rights Reserved. See LICENSE.txt in the project
 // root for license information.
 //
-// $ cargo run --package kona_lex --example tokens
+// $ cargo run --package kona_parse --example tokens
 
 use std::path::PathBuf;
 
-use kona_lex::lexer::tokenize;
+use kona_parse::lex::tokenize;
 use kona_source::pos::Pos;
 
 fn main() {
