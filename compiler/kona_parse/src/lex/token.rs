@@ -37,6 +37,8 @@ pub enum TokenKind {
 
     Trivia(TriviaKind),
     Invalid,
+
+    Eof,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

@@ -5,7 +5,7 @@
 
 use std::path::PathBuf;
 
-use kona_parse::lex::tokenize;
+use kona_parse::lex::token_iter::TokenIter;
 use kona_source::pos::Pos;
 
 fn main() {
@@ -19,7 +19,9 @@ fn main() {
     let src = std::fs::read_to_string(src_file)
         .expect(&error_msg);
 
-    tokenize(&src, Pos::from_usize(0)).for_each(|token|
-        println!("{:?}", token)
-    );
+    let mut ti = TokenIter::new(&src, Pos::from_usize(0));
+
+    while let Some(token) = ti.eat() {
+        println!("{:?}", token);
+    }
 }

@@ -48,7 +48,7 @@ lazy_static! {
 }
 
 impl SourceIter<'_> {
-    fn lex_token(&mut self) -> Token {
+    pub(super) fn lex_token(&mut self) -> Token {
         let kind = match self.peek_fst() {
             // Comment or operator start with '/'.
             '/' => {
