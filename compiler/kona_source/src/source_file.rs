@@ -9,7 +9,7 @@ use crate::{pos::Pos, source_analyzer};
 #[derive(Clone, PartialEq, Eq)]
 pub struct SourceFile {
     /// The path to the source file.
-    path: FilePath,
+    pub(crate) path: FilePath,
 
     /// The source code in the file.
     pub src: Rc<String>,
@@ -82,6 +82,10 @@ impl SourceFile {
             FilePath::LocalFile(path) => Some(path.as_path()),
             FilePath::Virtual(_) => None,
         }
+    }
+
+    pub fn file_name(&self) -> String {
+        self.path.linkify()
     }
 
     pub fn is_virtual(&self) -> bool {

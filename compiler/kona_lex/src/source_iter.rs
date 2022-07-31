@@ -3,6 +3,7 @@
 
 use std::str::Chars;
 
+use kona_diagnostic::DiagnosticsEngine;
 use kona_source::{pos::Pos, span::Span};
 
 /// Peekable iterator with position information over a source string.

@@ -2,9 +2,7 @@
 // root for license information.
 
 use std::collections::HashMap;
-
 use kona_source::pos::Pos;
-
 use crate::source_iter::SourceIter;
 use crate::char_spec::*;
 use crate::token::{TokenKind, LitKind, Token, TriviaKind};
@@ -19,6 +17,9 @@ pub fn tokenize(input: &str, start_pos: Pos) -> impl Iterator<Item = Token> + '_
             Some(iter.lex_token())
         }
     })
+
+    // Trivia is not supported yet.
+    .filter(|token| !matches!(token.kind, TokenKind::Trivia(_)))
 }
 
 lazy_static! {
@@ -106,7 +107,9 @@ impl SourceIter<'_> {
                     self.eat();
                     depth -= 1;
                     if depth == 0 {
-                        return TokenKind::Trivia(TriviaKind::MultiLineComment);
+                        return TokenKind::Trivia(TriviaKind::MultiLineComment {
+                            terminated: true,
+                        });
                     }
                 }
                 _ => (),
@@ -114,7 +117,9 @@ impl SourceIter<'_> {
         }
 
         // Unterminated multi-line comment.
-        TokenKind::Invalid
+        TokenKind::Trivia(TriviaKind::MultiLineComment {
+            terminated: false,
+        })
     }
 
     fn lex_inline_spaces(&mut self) -> TokenKind {
@@ -182,7 +187,9 @@ impl SourceIter<'_> {
         while let Some(c) = self.next() {
             match c {
                 '"' => {
-                    return TokenKind::Lit(LitKind::String)
+                    return TokenKind::Lit(LitKind::String {
+                        terminated: true,
+                    });
                 },
                 '\\' if matches!(self.peek_fst(), '0' | '\\' | 't'
                                                 | 'n' | 'r' | '"') => {
@@ -193,6 +200,8 @@ impl SourceIter<'_> {
         }
 
         // Unterminated string literal.
-        TokenKind::Invalid
+        TokenKind::Lit(LitKind::String {
+            terminated: false,
+        })
     }
 }

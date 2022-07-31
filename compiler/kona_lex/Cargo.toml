@@ -7,4 +7,5 @@ edition = "2021"
 kona_source = { path = "../kona_source" }
 kona_ast = { path = "../kona_ast" }
 kona_memory = { path = "../kona_memory" }
+kona_diagnostic = { path = "../kona_diagnostic" }
 lazy_static = "1.4.0"

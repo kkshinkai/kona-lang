@@ -44,13 +44,13 @@ pub enum LitKind {
     Int,
     Float,
     Bool,
-    String,
+    String { terminated: bool },
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TriviaKind {
     SingleLineComment,
-    MultiLineComment,
+    MultiLineComment { terminated: bool },
     Whitespace,
     Eol,
 }

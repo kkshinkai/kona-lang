@@ -5,7 +5,7 @@
 
 use std::path::PathBuf;
 
-use kona_lex::lexing::tokenize;
+use kona_lex::lexer::tokenize;
 use kona_source::pos::Pos;
 
 fn main() {

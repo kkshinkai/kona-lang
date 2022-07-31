@@ -6,4 +6,4 @@
 mod source_iter;
 mod char_spec;
 pub mod token;
-pub mod lexing;
+pub mod lexer;
