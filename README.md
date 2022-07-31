@@ -5,6 +5,18 @@ The Kona Programming Language
 
 An experimental functional programming language of the ML family.
 
+Roadmap to Kona 0.1
+-------------------
+
+- [ ] [KP-00001: Kona A New Programming Language](./docs/proposals/KP-00001.md)
+- [ ] KP-XXXXX: Modules And Qualified Identifiers
+- [ ] KP-XXXXX: Tuples And Destructuring Assignment
+- [ ] KP-XXXXX: Patterns And Pattern Matching
+- [ ] KP-XXXXX: Explicit Type Annotations
+- [ ] KP-XXXXX: Algebraic Data Types
+- [ ] KP-XXXXX: Lists
+- [ ] KP-XXXXX: Prelude The Minimal Standard Library
+
 License
 -------
 
